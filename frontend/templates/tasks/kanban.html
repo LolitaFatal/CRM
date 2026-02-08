@@ -1,0 +1,224 @@
+{% extends 'base.html' %}
+{% block title %}משימות - מערכת ניהול מרפאה{% endblock %}
+
+{% block extra_head %}
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="flex justify-between items-center mb-6">
+    <div class="flex items-center gap-4">
+        <h1 class="text-2xl font-bold">לוח משימות</h1>
+        <!-- View Toggle -->
+        <div class="flex items-center gap-2 bg-white border border-[#d0dbe7] rounded-lg p-1">
+            <button class="flex items-center gap-1 px-3 py-1 rounded bg-primary text-white text-xs font-bold">
+                <span class="material-symbols-outlined text-sm">view_kanban</span>
+                לוח
+            </button>
+        </div>
+    </div>
+    <button onclick="openCreateTaskModal()"
+            class="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-lg font-bold flex items-center gap-2 shadow-lg shadow-primary/20 transition-all">
+        <span class="material-symbols-outlined text-sm">add</span>
+        משימה חדשה
+    </button>
+</div>
+
+<!-- Kanban Board -->
+<div class="flex gap-6 overflow-x-auto pb-4" style="min-height: calc(100vh - 280px);">
+    <!-- Open Column -->
+    <div class="flex flex-col w-80 shrink-0">
+        <div class="flex items-center justify-between mb-4 px-1">
+            <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-primary"></span>
+                <h3 class="font-bold text-sm">פתוח</h3>
+                <span class="bg-slate-200 text-xs px-2 py-0.5 rounded-full font-bold">{{ tasks.open|length }}</span>
+            </div>
+        </div>
+        <div id="column-open" data-status="open" class="flex-1 space-y-4 overflow-y-auto pb-4 min-h-[200px]">
+            {% for task in tasks.open %}
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-transparent hover:border-primary/30 cursor-grab transition-all"
+                 data-task-id="{{ task.id }}">
+                <div class="flex justify-between items-start mb-2">
+                    {% if task.priority == 'urgent' %}
+                    <span class="text-[10px] px-2 py-0.5 rounded font-bold uppercase tracking-wider bg-red-100 text-red-600">דחוף</span>
+                    {% elif task.priority == 'medium' %}
+                    <span class="text-[10px] px-2 py-0.5 rounded font-bold uppercase tracking-wider bg-yellow-100 text-yellow-600">בינוני</span>
+                    {% else %}
+                    <span class="text-[10px] px-2 py-0.5 rounded font-bold uppercase tracking-wider bg-blue-100 text-blue-600">רגיל</span>
+                    {% endif %}
+                    <span class="material-symbols-outlined text-sm text-slate-400">drag_indicator</span>
+                </div>
+                <h4 class="text-sm font-bold mb-3 leading-snug">{{ task.title }}</h4>
+                <div class="flex items-center justify-between mt-4">
+                    <div class="flex items-center gap-2">
+                        <div class="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-[10px] font-bold text-primary">
+                            {{ (task.users.full_name[0] if task.users else '?') }}
+                        </div>
+                        <span class="text-xs text-[#4e7397]">{{ task.users.full_name if task.users else '-' }}</span>
+                    </div>
+                    {% if task.due_date %}
+                    <div class="flex items-center gap-1 text-[#4e7397]">
+                        <span class="material-symbols-outlined text-xs">calendar_today</span>
+                        <span class="text-[10px]">{{ task.due_date[5:] }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+            <button onclick="openCreateTaskModal('open')"
+                    class="w-full border-2 border-dashed border-slate-200 rounded-xl py-4 text-[#4e7397] hover:bg-white hover:border-primary transition-all flex flex-col items-center gap-1 group">
+                <span class="material-symbols-outlined group-hover:text-primary">add</span>
+                <span class="text-xs font-bold">הוספת משימה</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- In Progress Column -->
+    <div class="flex flex-col w-80 shrink-0">
+        <div class="flex items-center justify-between mb-4 px-1">
+            <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-orange-400"></span>
+                <h3 class="font-bold text-sm">בביצוע</h3>
+                <span class="bg-slate-200 text-xs px-2 py-0.5 rounded-full font-bold">{{ tasks.in_progress|length }}</span>
+            </div>
+        </div>
+        <div id="column-in_progress" data-status="in_progress" class="flex-1 space-y-4 overflow-y-auto pb-4 min-h-[200px]">
+            {% for task in tasks.in_progress %}
+            <div class="bg-white p-4 rounded-xl shadow-sm border-r-4 border-r-orange-400 border border-transparent hover:border-primary/30 cursor-grab transition-all"
+                 data-task-id="{{ task.id }}">
+                <div class="flex justify-between items-start mb-2">
+                    {% if task.priority == 'urgent' %}
+                    <span class="text-[10px] px-2 py-0.5 rounded font-bold uppercase tracking-wider bg-red-100 text-red-600">דחוף</span>
+                    {% elif task.priority == 'medium' %}
+                    <span class="text-[10px] px-2 py-0.5 rounded font-bold uppercase tracking-wider bg-yellow-100 text-yellow-600">בינוני</span>
+                    {% else %}
+                    <span class="text-[10px] px-2 py-0.5 rounded font-bold uppercase tracking-wider bg-blue-100 text-blue-600">רגיל</span>
+                    {% endif %}
+                    <span class="material-symbols-outlined text-sm text-slate-400">drag_indicator</span>
+                </div>
+                <h4 class="text-sm font-bold mb-3 leading-snug">{{ task.title }}</h4>
+                <div class="flex items-center justify-between mt-4">
+                    <div class="flex items-center gap-2">
+                        <div class="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-[10px] font-bold text-primary">
+                            {{ (task.users.full_name[0] if task.users else '?') }}
+                        </div>
+                        <span class="text-xs text-[#4e7397]">{{ task.users.full_name if task.users else '-' }}</span>
+                    </div>
+                    {% if task.due_date %}
+                    <div class="flex items-center gap-1 text-[#4e7397]">
+                        <span class="material-symbols-outlined text-xs">calendar_today</span>
+                        <span class="text-[10px]">{{ task.due_date[5:] }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Done Column -->
+    <div class="flex flex-col w-80 shrink-0 opacity-75">
+        <div class="flex items-center justify-between mb-4 px-1">
+            <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                <h3 class="font-bold text-sm">בוצע</h3>
+                <span class="bg-slate-200 text-xs px-2 py-0.5 rounded-full font-bold">{{ tasks.done|length }}</span>
+            </div>
+        </div>
+        <div id="column-done" data-status="done" class="flex-1 space-y-4 overflow-y-auto pb-4 min-h-[200px]">
+            {% for task in tasks.done %}
+            <div class="bg-white/60 p-4 rounded-xl shadow-sm border border-transparent line-through decoration-slate-400"
+                 data-task-id="{{ task.id }}">
+                <div class="flex justify-between items-start mb-2">
+                    <span class="text-[10px] px-2 py-0.5 rounded font-bold uppercase tracking-wider bg-slate-100 text-slate-400">הסתיים</span>
+                    <span class="material-symbols-outlined text-sm text-green-500">check_circle</span>
+                </div>
+                <h4 class="text-sm font-bold mb-3 leading-snug text-slate-500">{{ task.title }}</h4>
+                <div class="flex items-center justify-between mt-4">
+                    <div class="flex items-center gap-2">
+                        <div class="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center text-[10px] font-bold text-slate-400">
+                            {{ (task.users.full_name[0] if task.users else '?') }}
+                        </div>
+                        <span class="text-xs text-slate-400">{{ task.users.full_name if task.users else '-' }}</span>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- Create Task Modal -->
+<div id="taskModal" class="hidden fixed inset-0 bg-black/40 z-50 flex items-center justify-center">
+    <div class="bg-white rounded-xl shadow-xl w-full max-w-lg mx-4">
+        <div class="p-6 border-b border-[#d0dbe7] flex justify-between items-center">
+            <h3 class="text-lg font-bold">משימה חדשה</h3>
+            <button onclick="closeModal('taskModal')" class="text-slate-400 hover:text-slate-600">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+        <form id="taskForm" class="p-6 space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-[#4e7397] mb-1">כותרת</label>
+                <input name="title" required class="w-full px-3 py-2 bg-slate-50 border border-[#d0dbe7] rounded-lg text-sm focus:ring-primary focus:border-primary"/>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-[#4e7397] mb-1">תיאור</label>
+                <textarea name="description" rows="3" class="w-full px-3 py-2 bg-slate-50 border border-[#d0dbe7] rounded-lg text-sm focus:ring-primary focus:border-primary resize-none"></textarea>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-[#4e7397] mb-1">עדיפות</label>
+                    <select name="priority" class="w-full px-3 py-2 bg-slate-50 border border-[#d0dbe7] rounded-lg text-sm focus:ring-primary focus:border-primary">
+                        <option value="normal">רגיל</option>
+                        <option value="medium">בינוני</option>
+                        <option value="urgent">דחוף</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-[#4e7397] mb-1">תאריך יעד</label>
+                    <input name="due_date" type="date" class="w-full px-3 py-2 bg-slate-50 border border-[#d0dbe7] rounded-lg text-sm focus:ring-primary focus:border-primary"/>
+                </div>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-[#4e7397] mb-1">הקצה ל</label>
+                <select name="assigned_to" class="w-full px-3 py-2 bg-slate-50 border border-[#d0dbe7] rounded-lg text-sm focus:ring-primary focus:border-primary">
+                    {% for user in users %}
+                    <option value="{{ user.id }}">{{ user.full_name }} ({{ 'רופא' if user.role == 'doctor' else 'מזכירות' }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <input type="hidden" name="status" id="taskStatus" value="open"/>
+        </form>
+        <div class="p-6 border-t border-[#d0dbe7] flex justify-end gap-3">
+            <button onclick="closeModal('taskModal')" class="px-4 py-2 rounded-lg border border-[#d0dbe7] text-[#4e7397] hover:bg-slate-50">ביטול</button>
+            <button onclick="saveTask()" class="px-4 py-2 rounded-lg bg-primary text-white font-bold hover:bg-primary/90">שמירה</button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/crud-tables.js') }}"></script>
+<script src="{{ url_for('static', filename='js/kanban.js') }}"></script>
+<script>
+    function openCreateTaskModal(status = 'open') {
+        document.getElementById('taskForm').reset();
+        document.getElementById('taskStatus').value = status;
+        openModal('taskModal');
+    }
+
+    async function saveTask() {
+        const data = collectFormData('taskForm');
+        try {
+            const result = await apiFetch('/api/tasks', { method: 'POST', body: data });
+            if (result.success) {
+                showToast('משימה נוצרה', 'success');
+                closeModal('taskModal');
+                setTimeout(() => location.reload(), 500);
+            }
+        } catch (e) {}
+    }
+</script>
+{% endblock %}

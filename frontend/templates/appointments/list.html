@@ -1,0 +1,173 @@
+{% extends 'base.html' %}
+{% block title %}תורים - מערכת ניהול מרפאה{% endblock %}
+
+{% block content %}
+<div class="flex justify-between items-center mb-6">
+    <h1 class="text-2xl font-bold">תורים</h1>
+    <button onclick="openCreateModal()"
+            class="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-lg font-bold flex items-center gap-2 shadow-lg shadow-primary/20 transition-all">
+        <span class="material-symbols-outlined text-sm">add</span>
+        תור חדש
+    </button>
+</div>
+
+<!-- Filters -->
+<div class="bg-white rounded-xl border border-[#d0dbe7] shadow-sm mb-6">
+    <div class="p-4 flex items-center gap-4">
+        <div class="flex gap-2">
+            <button onclick="filterByStatus('')"
+                    class="px-3 py-1.5 rounded-lg text-xs font-bold {% if not status_filter %}bg-primary text-white{% else %}bg-slate-100 text-[#4e7397] hover:bg-slate-200{% endif %} transition-colors">
+                הכל
+            </button>
+            <button onclick="filterByStatus('scheduled')"
+                    class="px-3 py-1.5 rounded-lg text-xs font-bold {% if status_filter == 'scheduled' %}bg-primary text-white{% else %}bg-slate-100 text-[#4e7397] hover:bg-slate-200{% endif %} transition-colors">
+                מתוזמן
+            </button>
+            <button onclick="filterByStatus('completed')"
+                    class="px-3 py-1.5 rounded-lg text-xs font-bold {% if status_filter == 'completed' %}bg-primary text-white{% else %}bg-slate-100 text-[#4e7397] hover:bg-slate-200{% endif %} transition-colors">
+                הושלם
+            </button>
+            <button onclick="filterByStatus('cancelled')"
+                    class="px-3 py-1.5 rounded-lg text-xs font-bold {% if status_filter == 'cancelled' %}bg-primary text-white{% else %}bg-slate-100 text-[#4e7397] hover:bg-slate-200{% endif %} transition-colors">
+                בוטל
+            </button>
+            <button onclick="filterByStatus('no_show')"
+                    class="px-3 py-1.5 rounded-lg text-xs font-bold {% if status_filter == 'no_show' %}bg-primary text-white{% else %}bg-slate-100 text-[#4e7397] hover:bg-slate-200{% endif %} transition-colors">
+                לא הגיע
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Table -->
+<div class="bg-white rounded-xl border border-[#d0dbe7] shadow-sm overflow-hidden">
+    <div class="overflow-x-auto">
+        <table class="w-full text-right">
+            <thead class="bg-slate-50 text-[#4e7397] text-xs font-bold">
+                <tr>
+                    <th class="px-6 py-4">מטופל</th>
+                    <th class="px-6 py-4">שירות</th>
+                    <th class="px-6 py-4">תאריך ושעה</th>
+                    <th class="px-6 py-4">סטטוס</th>
+                    <th class="px-6 py-4">פעולות</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-[#d0dbe7]">
+                {% for apt in data %}
+                <tr class="hover:bg-slate-50 transition-colors">
+                    <td class="px-6 py-4">
+                        <span class="text-sm font-medium">
+                            {% if apt.patients %}{{ apt.patients.first_name }} {{ apt.patients.last_name }}{% else %}-{% endif %}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 text-sm">{{ apt.services.name if apt.services else '-' }}</td>
+                    <td class="px-6 py-4 text-sm">{{ apt.appointment_date[:16].replace('T', ' ') }}</td>
+                    <td class="px-6 py-4">
+                        {% if apt.status == 'completed' %}
+                        <span class="px-2 py-1 rounded-full bg-green-100 text-green-700 text-xs font-bold">הושלם</span>
+                        {% elif apt.status == 'scheduled' %}
+                        <span class="px-2 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-bold">מתוזמן</span>
+                        {% elif apt.status == 'cancelled' %}
+                        <span class="px-2 py-1 rounded-full bg-red-100 text-red-700 text-xs font-bold">בוטל</span>
+                        {% else %}
+                        <span class="px-2 py-1 rounded-full bg-yellow-100 text-yellow-700 text-xs font-bold">לא הגיע</span>
+                        {% endif %}
+                    </td>
+                    <td class="px-6 py-4">
+                        <div class="flex items-center gap-1">
+                            <select onchange="updateAptStatus('{{ apt.id }}', this.value)"
+                                    class="text-xs bg-slate-50 border border-[#d0dbe7] rounded-lg px-2 py-1 focus:ring-primary">
+                                <option value="scheduled" {% if apt.status == 'scheduled' %}selected{% endif %}>מתוזמן</option>
+                                <option value="completed" {% if apt.status == 'completed' %}selected{% endif %}>הושלם</option>
+                                <option value="cancelled" {% if apt.status == 'cancelled' %}selected{% endif %}>בוטל</option>
+                                <option value="no_show" {% if apt.status == 'no_show' %}selected{% endif %}>לא הגיע</option>
+                            </select>
+                            <button onclick="deleteRecord('/api/appointments/{{ apt.id }}', 'תור')"
+                                    class="text-danger hover:bg-danger/10 p-2 rounded-lg transition-colors">
+                                <span class="material-symbols-outlined text-lg">delete</span>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="5" class="px-6 py-12 text-center text-[#4e7397]">לא נמצאו תורים</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% if total > limit %}
+    <div class="p-4 border-t border-[#d0dbe7] flex justify-between items-center">
+        <span class="text-sm text-[#4e7397]">מציג {{ ((page-1)*limit)+1 }}-{{ [page*limit, total]|min }} מתוך {{ total }}</span>
+        <div class="flex gap-1">
+            {% for p in range(1, (total // limit) + 2) %}
+            <button onclick="goToPage({{ p }})" class="px-3 py-1 rounded-lg text-sm {% if p == page %}bg-primary text-white{% else %}hover:bg-slate-100 text-[#4e7397]{% endif %}">{{ p }}</button>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Create Modal -->
+<div id="appointmentModal" class="hidden fixed inset-0 bg-black/40 z-50 flex items-center justify-center">
+    <div class="bg-white rounded-xl shadow-xl w-full max-w-lg mx-4">
+        <div class="p-6 border-b border-[#d0dbe7] flex justify-between items-center">
+            <h3 class="text-lg font-bold">תור חדש</h3>
+            <button onclick="closeModal('appointmentModal')" class="text-slate-400 hover:text-slate-600">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+        <form id="appointmentForm" class="p-6 space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-[#4e7397] mb-1">מטופל</label>
+                <select name="patient_id" required class="w-full px-3 py-2 bg-slate-50 border border-[#d0dbe7] rounded-lg text-sm focus:ring-primary focus:border-primary">
+                    <option value="">בחר מטופל...</option>
+                    {% for p in patients_list %}
+                    <option value="{{ p.id }}">{{ p.first_name }} {{ p.last_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-[#4e7397] mb-1">שירות</label>
+                <select name="service_id" required class="w-full px-3 py-2 bg-slate-50 border border-[#d0dbe7] rounded-lg text-sm focus:ring-primary focus:border-primary">
+                    <option value="">בחר שירות...</option>
+                    {% for s in services %}
+                    <option value="{{ s.id }}">{{ s.name }} - ₪{{ '{:,.0f}'.format(s.price|float) }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-[#4e7397] mb-1">תאריך ושעה</label>
+                <input name="appointment_date" type="datetime-local" required
+                       class="w-full px-3 py-2 bg-slate-50 border border-[#d0dbe7] rounded-lg text-sm focus:ring-primary focus:border-primary"/>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-[#4e7397] mb-1">הערות</label>
+                <textarea name="notes" rows="2" class="w-full px-3 py-2 bg-slate-50 border border-[#d0dbe7] rounded-lg text-sm focus:ring-primary focus:border-primary resize-none"></textarea>
+            </div>
+        </form>
+        <div class="p-6 border-t border-[#d0dbe7] flex justify-end gap-3">
+            <button onclick="closeModal('appointmentModal')" class="px-4 py-2 rounded-lg border border-[#d0dbe7] text-[#4e7397] hover:bg-slate-50">ביטול</button>
+            <button onclick="saveAppointment()" class="px-4 py-2 rounded-lg bg-primary text-white font-bold hover:bg-primary/90">שמירה</button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/crud-tables.js') }}"></script>
+<script>
+    function openCreateModal() {
+        document.getElementById('appointmentForm').reset();
+        openModal('appointmentModal');
+    }
+    function saveAppointment() {
+        submitForm('/api/appointments', 'POST', 'appointmentForm', 'appointmentModal');
+    }
+    async function updateAptStatus(id, status) {
+        try {
+            await apiFetch(`/api/appointments/${id}`, { method: 'PUT', body: { status } });
+            showToast('סטטוס עודכן', 'success');
+        } catch (e) {}
+    }
+</script>
+{% endblock %}

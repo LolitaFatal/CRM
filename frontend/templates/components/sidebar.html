@@ -1,0 +1,63 @@
+<aside class="w-64 flex-shrink-0 border-l border-[#d0dbe7] bg-white flex flex-col justify-between py-6">
+    <div class="flex flex-col gap-8">
+        <!-- Clinic Profile -->
+        <div class="px-6 flex items-center gap-3">
+            <div class="size-12 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                <span class="material-symbols-outlined">medical_services</span>
+            </div>
+            <div class="flex flex-col">
+                <h2 class="text-[#0e141b] text-base font-bold leading-tight">מרפאה פרטית</h2>
+                <p class="text-[#4e7397] text-xs">ד"ר כהן אבי</p>
+            </div>
+        </div>
+        <!-- Navigation Links -->
+        <nav class="flex flex-col px-3 gap-1">
+            {% set nav_items = [
+                ('dashboard.index', 'dashboard', 'לוח בקרה', false),
+                ('patients.list_patients', 'group', 'מטופלים', false),
+                ('services.list_services', 'medical_services', 'שירותים', false),
+                ('appointments.list_appointments', 'calendar_today', 'תורים', false),
+                ('invoices.list_invoices', 'receipt_long', 'חשבוניות', false),
+                ('tasks.kanban', 'task_alt', 'משימות', false),
+                ('chat.index', 'chat_bubble', 'צ\'אט AI', true),
+            ] %}
+            {% for endpoint, icon, label, doctor_only in nav_items %}
+                {% if not doctor_only or session.get('user_role') == 'doctor' %}
+                <a href="{{ url_for(endpoint) }}"
+                   class="flex items-center gap-3 px-4 py-3 rounded-lg transition-colors
+                   {% if request.endpoint == endpoint %}
+                       bg-primary/10 text-primary font-bold
+                   {% else %}
+                       text-[#4e7397] hover:bg-slate-100
+                   {% endif %}">
+                    <span class="material-symbols-outlined">{{ icon }}</span>
+                    <span class="text-sm font-medium">{{ label }}</span>
+                </a>
+                {% endif %}
+            {% endfor %}
+        </nav>
+    </div>
+    <!-- Bottom Section -->
+    <div class="px-4 flex flex-col gap-4">
+        <button onclick="window.location.href='{{ url_for('appointments.list_appointments') }}'"
+                class="w-full bg-primary hover:bg-primary/90 text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg shadow-primary/20 transition-all">
+            <span class="material-symbols-outlined text-xl">add_circle</span>
+            <span>תור חדש</span>
+        </button>
+        <!-- User Info + Logout -->
+        <div class="flex items-center gap-3 px-2 pt-4 border-t border-[#d0dbe7]">
+            <div class="size-8 rounded-full bg-primary/10 flex items-center justify-center text-primary text-sm font-bold">
+                {{ session.get('user_name', '?')[0] }}
+            </div>
+            <div class="flex-1">
+                <p class="text-xs font-bold leading-none">{{ session.get('user_name', '') }}</p>
+                <p class="text-[10px] text-[#4e7397] mt-1">
+                    {% if session.get('user_role') == 'doctor' %}רופא{% else %}מזכירות{% endif %}
+                </p>
+            </div>
+            <a href="{{ url_for('auth.logout') }}" class="text-[#4e7397] hover:text-danger transition-colors" title="התנתק">
+                <span class="material-symbols-outlined text-sm">logout</span>
+            </a>
+        </div>
+    </div>
+</aside>

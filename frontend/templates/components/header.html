@@ -1,0 +1,17 @@
+<header class="px-8 py-4 bg-white border-b border-[#d0dbe7] flex justify-between items-center">
+    <div>
+        <h1 class="text-xl font-bold text-[#0e141b]">{% block page_title %}{% endblock %}</h1>
+        {% block page_subtitle %}<p class="text-[#4e7397] text-sm"></p>{% endblock %}
+    </div>
+    <div class="flex items-center gap-4">
+        <div class="relative">
+            <input class="pr-10 pl-4 py-2 bg-white border border-[#d0dbe7] rounded-lg text-sm focus:ring-primary focus:border-primary w-64"
+                   placeholder="חיפוש..." type="text" id="global-search"/>
+            <span class="material-symbols-outlined absolute right-3 top-2.5 text-slate-400 text-lg">search</span>
+        </div>
+        <button class="size-10 flex items-center justify-center rounded-full bg-white border border-[#d0dbe7] relative hover:bg-slate-50 transition-colors">
+            <span class="material-symbols-outlined text-[#4e7397]">notifications</span>
+            <span class="absolute top-2 right-2.5 size-2 bg-danger rounded-full border-2 border-white"></span>
+        </button>
+    </div>
+</header>

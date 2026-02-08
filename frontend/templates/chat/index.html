@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% block title %}צ'אט AI - מערכת ניהול מרפאה{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <div class="bg-white rounded-xl border border-[#d0dbe7] shadow-sm flex flex-col" style="height: calc(100vh - 200px);">
+        <!-- Chat Header -->
+        <div class="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50 rounded-t-xl">
+            <div class="flex items-center gap-3">
+                <div class="size-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                    <span class="material-symbols-outlined">psychology</span>
+                </div>
+                <div>
+                    <h3 class="font-bold">עוזר AI למרפאה</h3>
+                    <p class="text-xs text-[#4e7397]">שאל שאלות על נתוני המרפאה בשפה טבעית</p>
+                </div>
+            </div>
+            <span class="px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold uppercase">RAG Active</span>
+        </div>
+
+        <!-- Chat Messages -->
+        <div id="chatMessages" class="flex-1 overflow-y-auto p-6 space-y-4">
+            <!-- Welcome Message -->
+            <div class="flex flex-col items-start gap-1">
+                <div class="bg-slate-100 p-4 rounded-2xl rounded-tr-none text-sm max-w-[80%]">
+                    <p class="font-bold text-primary mb-2">שלום ד"ר כהן! 👋</p>
+                    <p>אני עוזר ה-AI של המרפאה. אני יכול לענות על שאלות לגבי מטופלים, תורים, חשבוניות ושירותים.</p>
+                    <p class="mt-2 text-[#4e7397]">דוגמאות לשאלות:</p>
+                    <ul class="mt-1 space-y-1 text-[#4e7397]">
+                        <li>• כמה תורים יש השבוע?</li>
+                        <li>• מה ההכנסה החודשית?</li>
+                        <li>• מי המטופלים שלא הגיעו יותר מ-3 חודשים?</li>
+                        <li>• אילו שירותים הכי פופולריים?</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chat Input -->
+        <div class="p-4 border-t border-slate-100">
+            <form id="chatForm" onsubmit="sendChat(event)" class="relative">
+                <textarea id="chatInput"
+                          class="w-full rounded-xl border border-[#d0dbe7] bg-slate-50 px-4 py-3 pl-14 text-sm focus:ring-2 focus:ring-primary focus:border-transparent resize-none"
+                          placeholder="שאל שאלה על נתוני המרפאה..." rows="2"
+                          onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault();sendChat(event)}"></textarea>
+                <button type="submit"
+                        class="absolute left-2 bottom-2 size-10 bg-primary text-white rounded-lg flex items-center justify-center hover:bg-primary/90 transition-colors">
+                    <span class="material-symbols-outlined">send</span>
+                </button>
+            </form>
+            <p class="text-[10px] text-slate-400 mt-2 text-center">ה-AI עונה רק על שאלות הקשורות לנתוני המרפאה. תשובות מבוססות נתונים בלבד.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/chat.js') }}"></script>
+{% endblock %}

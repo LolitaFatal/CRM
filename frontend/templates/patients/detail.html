@@ -1,0 +1,314 @@
+{% extends 'base.html' %}
+{% block title %}{{ patient.first_name }} {{ patient.last_name }} - מערכת ניהול מרפאה{% endblock %}
+
+{% block content %}
+<!-- Breadcrumb + Header -->
+<div class="mb-6">
+    <div class="flex items-center gap-2 text-sm text-slate-500 mb-2">
+        <a href="{{ url_for('patients.list_patients') }}" class="hover:text-primary transition-colors">מטופלים</a>
+        <span class="material-symbols-outlined text-xs">chevron_left</span>
+        <span class="text-[#0e141b] font-medium">{{ patient.first_name }} {{ patient.last_name }}</span>
+    </div>
+    <div class="flex flex-wrap justify-between items-start gap-4">
+        <div>
+            <h2 class="text-2xl font-bold">{{ patient.first_name }} {{ patient.last_name }}</h2>
+            <div class="flex flex-wrap items-center gap-4 mt-2 text-sm text-[#4e7397]">
+                {% if patient.date_of_birth %}
+                <span class="flex items-center gap-1">
+                    <span class="material-symbols-outlined text-sm">cake</span>
+                    {{ patient.date_of_birth }}
+                </span>
+                {% endif %}
+                {% if patient.phone %}
+                <span class="flex items-center gap-1">
+                    <span class="material-symbols-outlined text-sm">call</span>
+                    {{ patient.phone }}
+                </span>
+                {% endif %}
+                {% if patient.email %}
+                <span class="flex items-center gap-1">
+                    <span class="material-symbols-outlined text-sm">mail</span>
+                    {{ patient.email }}
+                </span>
+                {% endif %}
+            </div>
+        </div>
+        <a href="{{ url_for('appointments.list_appointments') }}"
+           class="flex items-center gap-2 px-4 h-10 rounded-lg bg-primary text-white font-bold text-sm hover:bg-primary/90 transition-all">
+            <span class="material-symbols-outlined text-sm">add</span>
+            פגישה חדשה
+        </a>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+    <!-- Left Column: Details -->
+    <div class="xl:col-span-2 flex flex-col gap-6">
+        <!-- Personal Info Card -->
+        <section class="bg-white rounded-xl border border-[#d0dbe7] shadow-sm overflow-hidden">
+            <div class="p-4 border-b border-slate-100 flex justify-between items-center">
+                <h3 class="font-bold flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary">person</span>
+                    פרטים אישיים
+                </h3>
+            </div>
+            <div class="p-5 grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-8">
+                <div>
+                    <p class="text-xs text-slate-500 mb-1">תעודת זהות</p>
+                    <p class="font-medium">{{ patient.id_number or '-' }}</p>
+                </div>
+                <div>
+                    <p class="text-xs text-slate-500 mb-1">תאריך לידה</p>
+                    <p class="font-medium">{{ patient.date_of_birth or '-' }}</p>
+                </div>
+                <div>
+                    <p class="text-xs text-slate-500 mb-1">מין</p>
+                    <p class="font-medium">{% if patient.gender == 'male' %}זכר{% elif patient.gender == 'female' %}נקבה{% else %}אחר{% endif %}</p>
+                </div>
+                <div>
+                    <p class="text-xs text-slate-500 mb-1">כתובת</p>
+                    <p class="font-medium">{{ patient.address or '-' }}</p>
+                </div>
+            </div>
+        </section>
+
+        {% if session.get('user_role') == 'doctor' %}
+        <!-- Medical History (Doctor Only) -->
+        <section class="bg-primary/5 rounded-xl border border-primary/20 overflow-hidden shadow-sm">
+            <div class="p-4 border-b border-primary/10 flex justify-between items-center bg-primary/10">
+                <h3 class="font-bold text-primary flex items-center gap-2">
+                    <span class="material-symbols-outlined">shield_person</span>
+                    היסטוריה רפואית (רופא בלבד)
+                </h3>
+            </div>
+            {% if medical_history %}
+            <div class="p-5 grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="space-y-4">
+                    <div>
+                        <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">אבחנות</h4>
+                        <div class="flex flex-wrap gap-2">
+                            {% for d in (medical_history.diagnoses or []) %}
+                            <span class="px-2.5 py-1 bg-white rounded text-sm border border-slate-200">{{ d }}</span>
+                            {% else %}
+                            <span class="text-sm text-slate-400">ללא אבחנות</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div>
+                        <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">תרופות קבועות</h4>
+                        <ul class="text-sm space-y-1">
+                            {% for m in (medical_history.medications or []) %}
+                            <li class="flex items-center gap-2">
+                                <span class="size-1.5 rounded-full bg-primary"></span>
+                                {{ m }}
+                            </li>
+                            {% else %}
+                            <li class="text-slate-400">ללא תרופות קבועות</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+                <div class="space-y-4">
+                    <div>
+                        <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">אלרגיות</h4>
+                        {% for a in (medical_history.allergies or []) %}
+                            {% if a != 'ללא אלרגיות ידועות' %}
+                            <div class="flex items-center gap-2 px-3 py-2 bg-red-50 text-red-600 rounded-lg border border-red-100 font-bold text-sm mb-2">
+                                <span class="material-symbols-outlined text-sm">warning</span>
+                                {{ a }}
+                            </div>
+                            {% else %}
+                            <span class="text-sm text-slate-400">{{ a }}</span>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                    <div>
+                        <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">מצבים כרוניים</h4>
+                        <p class="text-sm">{{ medical_history.chronic_conditions or 'ללא' }}</p>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="p-5 text-center text-slate-400">
+                <p>אין היסטוריה רפואית עבור מטופל זה</p>
+            </div>
+            {% endif %}
+        </section>
+        {% endif %}
+
+        <!-- Appointments History -->
+        <div class="bg-white rounded-xl border border-[#d0dbe7] shadow-sm overflow-hidden">
+            <div class="p-4 border-b border-slate-100">
+                <h3 class="font-bold flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary">history</span>
+                    היסטוריית פגישות
+                </h3>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-right border-collapse">
+                    <thead>
+                        <tr class="bg-slate-50 text-slate-500 text-xs font-bold">
+                            <th class="px-5 py-3">תאריך</th>
+                            <th class="px-5 py-3">סוג שירות</th>
+                            <th class="px-5 py-3">סטטוס</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-sm">
+                        {% for apt in appointments %}
+                        <tr class="hover:bg-slate-50 transition-colors">
+                            <td class="px-5 py-4 border-b border-slate-100 font-medium">{{ apt.appointment_date[:10] }}</td>
+                            <td class="px-5 py-4 border-b border-slate-100">{{ apt.services.name if apt.services else '-' }}</td>
+                            <td class="px-5 py-4 border-b border-slate-100">
+                                {% if apt.status == 'completed' %}
+                                <span class="px-2 py-1 rounded-full bg-green-100 text-green-700 text-xs font-bold">הושלם</span>
+                                {% elif apt.status == 'scheduled' %}
+                                <span class="px-2 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-bold">מתוזמן</span>
+                                {% elif apt.status == 'cancelled' %}
+                                <span class="px-2 py-1 rounded-full bg-red-100 text-red-700 text-xs font-bold">בוטל</span>
+                                {% else %}
+                                <span class="px-2 py-1 rounded-full bg-yellow-100 text-yellow-700 text-xs font-bold">לא הגיע</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr><td colspan="3" class="px-5 py-8 text-center text-slate-400">אין פגישות</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Invoice History -->
+        <div class="bg-white rounded-xl border border-[#d0dbe7] shadow-sm overflow-hidden">
+            <div class="p-4 border-b border-slate-100">
+                <h3 class="font-bold flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary">payments</span>
+                    היסטוריית חיובים
+                </h3>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-right border-collapse">
+                    <thead>
+                        <tr class="bg-slate-50 text-slate-500 text-xs font-bold">
+                            <th class="px-5 py-3">מס' חשבונית</th>
+                            <th class="px-5 py-3">תאריך</th>
+                            <th class="px-5 py-3">סכום</th>
+                            <th class="px-5 py-3">סטטוס</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-sm">
+                        {% for inv in invoices %}
+                        <tr class="hover:bg-slate-50 transition-colors">
+                            <td class="px-5 py-4 border-b border-slate-100 font-medium">{{ inv.invoice_number }}</td>
+                            <td class="px-5 py-4 border-b border-slate-100">{{ inv.issued_date }}</td>
+                            <td class="px-5 py-4 border-b border-slate-100">₪{{ '{:,.0f}'.format(inv.amount|float) }}</td>
+                            <td class="px-5 py-4 border-b border-slate-100">
+                                {% if inv.status == 'paid' %}
+                                <span class="px-2 py-1 rounded-full bg-green-100 text-green-700 text-xs font-bold">שולם</span>
+                                {% elif inv.status == 'pending' %}
+                                <span class="px-2 py-1 rounded-full bg-yellow-100 text-yellow-700 text-xs font-bold">בהמתנה</span>
+                                {% else %}
+                                <span class="px-2 py-1 rounded-full bg-red-100 text-red-700 text-xs font-bold">באיחור</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr><td colspan="4" class="px-5 py-8 text-center text-slate-400">אין חשבוניות</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Column: Chat Panel (Doctor Only) -->
+    {% if session.get('user_role') == 'doctor' %}
+    <div class="xl:col-span-1">
+        <section class="bg-white rounded-xl border border-[#d0dbe7] flex flex-col h-[calc(100vh-200px)] shadow-lg sticky top-6">
+            <div class="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+                <h3 class="font-bold flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary">psychology</span>
+                    עוזר רפואי AI
+                </h3>
+                <span class="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-bold uppercase">RAG</span>
+            </div>
+            <div id="patientChatMessages" class="flex-1 overflow-y-auto p-4 space-y-4">
+                <div class="flex flex-col items-start gap-1">
+                    <div class="bg-slate-100 p-3 rounded-2xl rounded-tr-none text-sm max-w-[85%]">
+                        שלום ד"ר כהן. אני מנתח את התיק של {{ patient.first_name }} {{ patient.last_name }}. איך אוכל לעזור?
+                    </div>
+                </div>
+            </div>
+            <div class="p-4 border-t border-slate-100">
+                <div class="relative">
+                    <textarea id="patientChatInput"
+                              class="w-full rounded-xl border border-[#d0dbe7] bg-slate-50 px-4 py-3 text-sm focus:ring-2 focus:ring-primary focus:border-transparent resize-none"
+                              placeholder="שאל שאלה על המטופל..." rows="2"
+                              onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault();sendPatientChat()}"></textarea>
+                    <button onclick="sendPatientChat()"
+                            class="absolute left-2 bottom-2 size-8 bg-primary text-white rounded-lg flex items-center justify-center hover:bg-primary/90 transition-colors">
+                        <span class="material-symbols-outlined text-sm">send</span>
+                    </button>
+                </div>
+                <p class="text-[10px] text-slate-400 mt-2 text-center">ה-AI עשוי לטעות. יש לאמת מידע רפואי קריטי.</p>
+            </div>
+        </section>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+async function sendPatientChat() {
+    const input = document.getElementById('patientChatInput');
+    const container = document.getElementById('patientChatMessages');
+    const question = input.value.trim();
+    if (!question) return;
+
+    // Add user message
+    container.innerHTML += `
+        <div class="flex flex-col items-end gap-1">
+            <div class="bg-primary text-white p-3 rounded-2xl rounded-tl-none text-sm max-w-[85%]">${question}</div>
+        </div>`;
+    input.value = '';
+    container.scrollTop = container.scrollHeight;
+
+    // Add typing indicator
+    container.innerHTML += `
+        <div id="typing" class="flex flex-col items-start gap-1">
+            <div class="bg-slate-100 p-3 rounded-2xl rounded-tr-none text-sm flex gap-1">
+                <div class="size-2 bg-slate-400 rounded-full typing-dot"></div>
+                <div class="size-2 bg-slate-400 rounded-full typing-dot"></div>
+                <div class="size-2 bg-slate-400 rounded-full typing-dot"></div>
+            </div>
+        </div>`;
+    container.scrollTop = container.scrollHeight;
+
+    try {
+        const res = await fetch('/api/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ question }),
+        });
+        const data = await res.json();
+        document.getElementById('typing')?.remove();
+
+        const answer = data.data?.answer || 'שגיאה בעיבוד השאלה';
+        container.innerHTML += `
+            <div class="flex flex-col items-start gap-1">
+                <div class="bg-slate-100 p-3 rounded-2xl rounded-tr-none text-sm max-w-[85%] border-r-4 border-primary">
+                    ${answer}
+                </div>
+            </div>`;
+    } catch (e) {
+        document.getElementById('typing')?.remove();
+        container.innerHTML += `
+            <div class="flex flex-col items-start gap-1">
+                <div class="bg-red-50 text-red-600 p-3 rounded-2xl rounded-tr-none text-sm max-w-[85%]">שגיאה בחיבור לשרת</div>
+            </div>`;
+    }
+    container.scrollTop = container.scrollHeight;
+}
+</script>
+{% endblock %}

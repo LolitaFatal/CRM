@@ -1,0 +1,170 @@
+{% extends 'base.html' %}
+{% block title %}לוח בקרה - מערכת ניהול מרפאה{% endblock %}
+
+{% block extra_head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+{% endblock %}
+
+{% block content %}
+<!-- Header -->
+<div class="flex justify-between items-center mb-8">
+    <div>
+        <h1 class="text-2xl font-bold text-[#0e141b]">שלום, {{ session.get('user_name', '') }}</h1>
+        <p class="text-[#4e7397] text-sm">הנה סקירה של המרפאה שלך</p>
+    </div>
+</div>
+
+<!-- KPI Cards -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <!-- Total Patients -->
+    <div class="bg-white p-6 rounded-xl border border-[#d0dbe7] shadow-sm">
+        <div class="flex justify-between items-start mb-4">
+            <div class="size-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+                <span class="material-symbols-outlined">person</span>
+            </div>
+            <span class="text-success text-xs font-bold bg-success/10 px-2 py-1 rounded-full">פעיל</span>
+        </div>
+        <p class="text-[#4e7397] text-sm font-medium mb-1">סה"כ מטופלים</p>
+        <p class="text-2xl font-bold text-[#0e141b]">{{ '{:,}'.format(total_patients) }}</p>
+    </div>
+    <!-- Monthly Appointments -->
+    <div class="bg-white p-6 rounded-xl border border-[#d0dbe7] shadow-sm">
+        <div class="flex justify-between items-start mb-4">
+            <div class="size-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+                <span class="material-symbols-outlined">event_available</span>
+            </div>
+        </div>
+        <p class="text-[#4e7397] text-sm font-medium mb-1">תורים החודש</p>
+        <p class="text-2xl font-bold text-[#0e141b]">{{ monthly_appointments }}</p>
+    </div>
+    <!-- Monthly Revenue -->
+    <div class="bg-white p-6 rounded-xl border border-[#d0dbe7] shadow-sm">
+        <div class="flex justify-between items-start mb-4">
+            <div class="size-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+                <span class="material-symbols-outlined">payments</span>
+            </div>
+            <span class="text-success text-xs font-bold bg-success/10 px-2 py-1 rounded-full">שולם</span>
+        </div>
+        <p class="text-[#4e7397] text-sm font-medium mb-1">הכנסות החודש</p>
+        <p class="text-2xl font-bold text-[#0e141b]">₪{{ '{:,.0f}'.format(monthly_revenue) }}</p>
+    </div>
+    <!-- Pending Payments -->
+    <div class="bg-white p-6 rounded-xl border border-[#d0dbe7] shadow-sm">
+        <div class="flex justify-between items-start mb-4">
+            <div class="size-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+                <span class="material-symbols-outlined">pending_actions</span>
+            </div>
+            <span class="text-warning text-xs font-bold bg-warning/10 px-2 py-1 rounded-full">{{ pending_count }} בהמתנה</span>
+        </div>
+        <p class="text-[#4e7397] text-sm font-medium mb-1">תשלומים בהמתנה</p>
+        <p class="text-2xl font-bold text-[#0e141b]">₪{{ '{:,.0f}'.format(pending_total) }}</p>
+    </div>
+</div>
+
+<!-- Charts Grid -->
+<div class="grid grid-cols-1 xl:grid-cols-2 gap-8 mb-8">
+    <!-- Revenue Chart -->
+    <div class="bg-white p-6 rounded-xl border border-[#d0dbe7] shadow-sm">
+        <div class="flex justify-between items-center mb-6">
+            <h3 class="text-lg font-bold">הכנסות לאורך זמן</h3>
+        </div>
+        <div class="h-64">
+            <canvas id="revenueChart"></canvas>
+        </div>
+    </div>
+    <!-- Appointment Status -->
+    <div class="bg-white p-6 rounded-xl border border-[#d0dbe7] shadow-sm">
+        <h3 class="text-lg font-bold mb-6">סטטוס תורים</h3>
+        <div class="h-64 flex items-center justify-center">
+            <canvas id="appointmentChart"></canvas>
+        </div>
+    </div>
+</div>
+
+{% if session.get('user_role') == 'doctor' and churn_patients %}
+<!-- Churn Prediction Table -->
+<div class="bg-white rounded-xl border border-[#d0dbe7] shadow-sm">
+    <div class="p-6 border-b border-[#d0dbe7] flex justify-between items-center">
+        <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-primary">psychology</span>
+            <h3 class="text-lg font-bold">מטופלים בסיכון נטישה</h3>
+            <span class="text-[10px] font-bold bg-primary/10 text-primary px-2 py-0.5 rounded uppercase tracking-wider">Predictive AI</span>
+        </div>
+    </div>
+    <div class="overflow-x-auto">
+        <table class="w-full text-right">
+            <thead class="bg-slate-50 text-[#4e7397] text-xs font-bold">
+                <tr>
+                    <th class="px-6 py-4">שם המטופל</th>
+                    <th class="px-6 py-4">ביקור אחרון</th>
+                    <th class="px-6 py-4">הסתברות נטישה</th>
+                    <th class="px-6 py-4">רמת סיכון</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-[#d0dbe7]">
+                {% for p in churn_patients %}
+                <tr class="hover:bg-slate-50 transition-colors">
+                    <td class="px-6 py-4">
+                        <div class="flex items-center gap-3">
+                            <div class="size-8 rounded-full bg-primary/10 flex items-center justify-center text-primary text-xs font-bold">
+                                {{ p.patient_name[0] }}
+                            </div>
+                            <span class="text-sm font-medium">{{ p.patient_name }}</span>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 text-sm text-slate-500">
+                        {% if p.last_visit %}
+                            {% if p.days_since_last_visit > 90 %}לפני {{ (p.days_since_last_visit // 30) }} חודשים
+                            {% elif p.days_since_last_visit > 30 %}לפני {{ (p.days_since_last_visit // 30) }} חודש
+                            {% elif p.days_since_last_visit > 7 %}לפני {{ (p.days_since_last_visit // 7) }} שבועות
+                            {% else %}לפני {{ p.days_since_last_visit }} ימים{% endif %}
+                        {% else %}לא ביקר{% endif %}
+                    </td>
+                    <td class="px-6 py-4">
+                        <div class="flex items-center gap-2">
+                            <div class="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden w-24">
+                                <div class="h-full rounded-full
+                                    {% if p.risk_level == 'high' %}bg-danger{% elif p.risk_level == 'medium' %}bg-warning{% else %}bg-success{% endif %}"
+                                     style="width: {{ p.churn_probability }}%"></div>
+                            </div>
+                            <span class="text-xs font-bold
+                                {% if p.risk_level == 'high' %}text-danger{% elif p.risk_level == 'medium' %}text-warning{% else %}text-success{% endif %}">
+                                {{ p.churn_probability }}%
+                            </span>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4">
+                        <span class="px-2 py-1 rounded-full text-xs font-bold
+                            {% if p.risk_level == 'high' %}bg-red-100 text-red-700
+                            {% elif p.risk_level == 'medium' %}bg-yellow-100 text-yellow-700
+                            {% else %}bg-green-100 text-green-700{% endif %}">
+                            {% if p.risk_level == 'high' %}גבוהה{% elif p.risk_level == 'medium' %}בינונית{% else %}נמוכה{% endif %}
+                        </span>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="p-4 bg-primary/5 border-t border-[#d0dbe7]">
+        <p class="text-xs text-[#4e7397]">
+            <span class="font-bold text-primary">המלצת AI:</span>
+            מומלץ ליצור קשר עם מטופלים ברמת סיכון גבוהה לתיאום ביקור מעקב.
+        </p>
+    </div>
+</div>
+{% endif %}
+
+<!-- Floating Chat Button -->
+{% if session.get('user_role') == 'doctor' %}
+<a href="{{ url_for('chat.index') }}"
+   class="fixed bottom-8 left-8 size-14 bg-primary text-white rounded-full shadow-2xl flex items-center justify-center hover:scale-105 transition-transform group z-30">
+    <span class="material-symbols-outlined text-2xl group-hover:hidden">chat_bubble</span>
+    <span class="hidden group-hover:inline text-xs font-bold">שאל AI</span>
+</a>
+{% endif %}
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/dashboard-charts.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html class="light" dir="rtl" lang="he">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>{% block title %}מערכת ניהול מרפאה{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700&family=Manrope:wght@200..800&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#197fe6",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#111921",
+                        "success": "#078838",
+                        "warning": "#f59e0b",
+                        "danger": "#e73908",
+                    },
+                    fontFamily: {
+                        "display": ["Heebo", "Manrope", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}">
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="bg-background-light text-[#0e141b] font-['Heebo','Manrope',sans-serif]">
+    <div class="flex h-screen overflow-hidden">
+        {% include 'components/sidebar.html' %}
+        <main class="flex-1 flex flex-col overflow-y-auto">
+            {% include 'components/header.html' %}
+            {% include 'components/flash_messages.html' %}
+            <div class="p-8">
+                {% block content %}{% endblock %}
+            </div>
+        </main>
+    </div>
+    <script src="{{ url_for('static', filename='js/utils.js') }}"></script>
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>

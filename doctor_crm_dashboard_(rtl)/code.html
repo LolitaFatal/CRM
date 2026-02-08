@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+
+<html class="light" dir="rtl" lang="he"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>מערכת ניהול מרפאה - לוח בקרה</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&amp;family=Heebo:wght@300;400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#197fe6",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#111921",
+                        "success": "#078838",
+                        "warning": "#f59e0b",
+                        "danger": "#e73908",
+                    },
+                    fontFamily: {
+                        "display": ["Heebo", "Manrope", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Heebo', 'Manrope', sans-serif;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .active-nav {
+            background-color: #e7edf3;
+            border-left: 4px solid #197fe6;
+        }
+        /* Custom scrollbar for clean look */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #d0dbe7;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-[#0e141b] dark:text-slate-50 transition-colors duration-200">
+<div class="flex h-screen overflow-hidden">
+<!-- Sidebar Navigation (Right side for RTL) -->
+<aside class="w-64 flex-shrink-0 border-l border-[#d0dbe7] dark:border-slate-700 bg-white dark:bg-[#1a242f] flex flex-col justify-between py-6">
+<div class="flex flex-col gap-8">
+<!-- Clinic Profile -->
+<div class="px-6 flex items-center gap-3">
+<div class="size-12 rounded-full bg-primary/10 flex items-center justify-center text-primary overflow-hidden">
+<img class="object-cover size-full" data-alt="Doctor portrait profile picture" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDyz81uYNJTC94ayysL-od9uLw8xH4PdVJBr-ySFuHYcaY2IEtdYoyelG_VZlzSQy-p-ux66hQTD4KUFBKc4vjHAav-jLFleSvjJrDWnEIW1nZLHNrA1O_g4ZRPieNV6Wp8CxeYTt3SyZ1JkNBHxbSXa7i-UYuZIZL-GGorZ1sQvVA7SD7h40Cl5s-rCMa8Xt4y-djKxoTZK-mpvrXqXbtON7b9Mt6GQM17o7oCfrVGYy4GawEbIdE4A2pnRtVap9kBmxRY9YgIU0tM"/>
+</div>
+<div class="flex flex-col">
+<h2 class="text-[#0e141b] dark:text-white text-base font-bold leading-tight">מרפאה פרטית</h2>
+<p class="text-[#4e7397] dark:text-slate-400 text-xs">ד"ר כהן אבי</p>
+</div>
+</div>
+<!-- Navigation Links -->
+<nav class="flex flex-col px-3 gap-1">
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg active-nav text-primary" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-sm font-medium">לוח בקרה</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="text-sm font-medium">מטופלים</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined">medical_services</span>
+<span class="text-sm font-medium">שירותים</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined">calendar_today</span>
+<span class="text-sm font-medium">תורים</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined">receipt_long</span>
+<span class="text-sm font-medium">חשבוניות</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined">task_alt</span>
+<span class="text-sm font-medium">משימות</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined">chat_bubble</span>
+<span class="text-sm font-medium">צ'אט AI</span>
+</a>
+</nav>
+</div>
+<div class="px-4">
+<button class="w-full bg-primary hover:bg-primary/90 text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg shadow-primary/20 transition-all">
+<span class="material-symbols-outlined text-xl">add_circle</span>
+<span>תור חדש</span>
+</button>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 overflow-y-auto p-8">
+<!-- Header Section -->
+<header class="flex justify-between items-center mb-8">
+<div>
+<h1 class="text-2xl font-bold text-[#0e141b] dark:text-white">שלום, ד"ר כהן</h1>
+<p class="text-[#4e7397] dark:text-slate-400">הנה סקירה של המרפאה שלך להיום, 24 במאי 2024</p>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative">
+<input class="pr-10 pl-4 py-2 bg-white dark:bg-[#1a242f] border border-[#d0dbe7] dark:border-slate-700 rounded-lg text-sm focus:ring-primary focus:border-primary w-64" placeholder="חיפוש מטופל או מסמך..." type="text"/>
+<span class="material-symbols-outlined absolute right-3 top-2.5 text-slate-400 text-lg">search</span>
+</div>
+<button class="size-10 flex items-center justify-center rounded-full bg-white dark:bg-[#1a242f] border border-[#d0dbe7] dark:border-slate-700 relative hover:bg-slate-50 transition-colors">
+<span class="material-symbols-outlined text-[#4e7397]">notifications</span>
+<span class="absolute top-2 right-2.5 size-2 bg-danger rounded-full border-2 border-white dark:border-[#1a242f]"></span>
+</button>
+</div>
+</header>
+<!-- KPI Cards Row -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+<!-- Metric Card 1 -->
+<div class="bg-white dark:bg-[#1a242f] p-6 rounded-xl border border-[#d0dbe7] dark:border-slate-700 shadow-sm">
+<div class="flex justify-between items-start mb-4">
+<div class="size-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">person</span>
+</div>
+<span class="text-success text-xs font-bold bg-success/10 px-2 py-1 rounded-full">+5.2%</span>
+</div>
+<p class="text-[#4e7397] dark:text-slate-400 text-sm font-medium mb-1">סה"כ מטופלים</p>
+<p class="text-2xl font-bold text-[#0e141b] dark:text-white">1,240</p>
+</div>
+<!-- Metric Card 2 -->
+<div class="bg-white dark:bg-[#1a242f] p-6 rounded-xl border border-[#d0dbe7] dark:border-slate-700 shadow-sm">
+<div class="flex justify-between items-start mb-4">
+<div class="size-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">event_available</span>
+</div>
+<span class="text-danger text-xs font-bold bg-danger/10 px-2 py-1 rounded-full">-2.4%</span>
+</div>
+<p class="text-[#4e7397] dark:text-slate-400 text-sm font-medium mb-1">תורים החודש</p>
+<p class="text-2xl font-bold text-[#0e141b] dark:text-white">84</p>
+</div>
+<!-- Metric Card 3 -->
+<div class="bg-white dark:bg-[#1a242f] p-6 rounded-xl border border-[#d0dbe7] dark:border-slate-700 shadow-sm">
+<div class="flex justify-between items-start mb-4">
+<div class="size-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">payments</span>
+</div>
+<span class="text-success text-xs font-bold bg-success/10 px-2 py-1 rounded-full">+12.1%</span>
+</div>
+<p class="text-[#4e7397] dark:text-slate-400 text-sm font-medium mb-1">הכנסות החודש</p>
+<p class="text-2xl font-bold text-[#0e141b] dark:text-white">₪42,500</p>
+</div>
+<!-- Metric Card 4 -->
+<div class="bg-white dark:bg-[#1a242f] p-6 rounded-xl border border-[#d0dbe7] dark:border-slate-700 shadow-sm">
+<div class="flex justify-between items-start mb-4">
+<div class="size-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">pending_actions</span>
+</div>
+<span class="text-warning text-xs font-bold bg-warning/10 px-2 py-1 rounded-full">8 בהמתנה</span>
+</div>
+<p class="text-[#4e7397] dark:text-slate-400 text-sm font-medium mb-1">תשלומים בהמתנה</p>
+<p class="text-2xl font-bold text-[#0e141b] dark:text-white">₪3,200</p>
+</div>
+</div>
+<!-- Content Grid: Charts and AI Predictions -->
+<div class="grid grid-cols-1 xl:grid-cols-2 gap-8">
+<!-- Right Column: Analytics Charts -->
+<div class="flex flex-col gap-8">
+<!-- Revenue Chart Card -->
+<div class="bg-white dark:bg-[#1a242f] p-6 rounded-xl border border-[#d0dbe7] dark:border-slate-700 shadow-sm">
+<div class="flex justify-between items-center mb-6">
+<h3 class="text-lg font-bold">הכנסות לאורך זמן</h3>
+<select class="text-xs bg-slate-50 dark:bg-slate-800 border-none rounded-lg focus:ring-primary">
+<option>6 חודשים אחרונים</option>
+<option>שנה אחרונה</option>
+</select>
+</div>
+<div class="h-64 flex items-end justify-between gap-4 px-2">
+<div class="flex flex-col items-center gap-2 flex-1 group">
+<div class="w-full bg-slate-100 dark:bg-slate-800 rounded-t-lg transition-all relative overflow-hidden h-[40%] group-hover:bg-primary/20">
+<div class="absolute bottom-0 w-full bg-primary/40 h-full"></div>
+</div>
+<span class="text-[10px] font-bold text-[#4e7397]">ינואר</span>
+</div>
+<div class="flex flex-col items-center gap-2 flex-1 group">
+<div class="w-full bg-slate-100 dark:bg-slate-800 rounded-t-lg transition-all relative overflow-hidden h-[55%] group-hover:bg-primary/20">
+<div class="absolute bottom-0 w-full bg-primary/40 h-full"></div>
+</div>
+<span class="text-[10px] font-bold text-[#4e7397]">פברואר</span>
+</div>
+<div class="flex flex-col items-center gap-2 flex-1 group">
+<div class="w-full bg-slate-100 dark:bg-slate-800 rounded-t-lg transition-all relative overflow-hidden h-[30%] group-hover:bg-primary/20">
+<div class="absolute bottom-0 w-full bg-primary/40 h-full"></div>
+</div>
+<span class="text-[10px] font-bold text-[#4e7397]">מרץ</span>
+</div>
+<div class="flex flex-col items-center gap-2 flex-1 group">
+<div class="w-full bg-slate-100 dark:bg-slate-800 rounded-t-lg transition-all relative overflow-hidden h-[75%] group-hover:bg-primary/20">
+<div class="absolute bottom-0 w-full bg-primary/40 h-full"></div>
+</div>
+<span class="text-[10px] font-bold text-[#4e7397]">אפריל</span>
+</div>
+<div class="flex flex-col items-center gap-2 flex-1 group">
+<div class="w-full bg-slate-100 dark:bg-slate-800 rounded-t-lg transition-all relative overflow-hidden h-[90%] group-hover:bg-primary/20">
+<div class="absolute bottom-0 w-full bg-primary h-full"></div>
+</div>
+<span class="text-[10px] font-bold text-[#4e7397]">מאי</span>
+</div>
+<div class="flex flex-col items-center gap-2 flex-1 group">
+<div class="w-full bg-slate-100 dark:bg-slate-800 rounded-t-lg transition-all relative overflow-hidden h-[65%] group-hover:bg-primary/20">
+<div class="absolute bottom-0 w-full bg-primary/40 h-full"></div>
+</div>
+<span class="text-[10px] font-bold text-[#4e7397]">יוני</span>
+</div>
+</div>
+</div>
+<!-- Appointment Distribution -->
+<div class="bg-white dark:bg-[#1a242f] p-6 rounded-xl border border-[#d0dbe7] dark:border-slate-700 shadow-sm">
+<h3 class="text-lg font-bold mb-6">סטטוס תורים</h3>
+<div class="flex items-center justify-around gap-8">
+<!-- Visual Donut (CSS only) -->
+<div class="relative size-40">
+<div class="size-full rounded-full border-[12px] border-slate-100 dark:border-slate-800"></div>
+<div class="absolute inset-0 size-full rounded-full border-[12px] border-t-primary border-r-primary border-l-transparent border-b-transparent rotate-45"></div>
+<div class="absolute inset-0 size-full rounded-full border-[12px] border-t-success border-r-transparent border-l-transparent border-b-transparent -rotate-[120deg]"></div>
+<div class="absolute inset-0 flex flex-col items-center justify-center">
+<span class="text-2xl font-bold">84</span>
+<span class="text-[10px] text-slate-400">סה"כ תורים</span>
+</div>
+</div>
+<!-- Legend -->
+<div class="flex flex-col gap-4">
+<div class="flex items-center gap-3">
+<div class="size-3 rounded-full bg-primary"></div>
+<div class="flex flex-col">
+<span class="text-xs text-[#4e7397]">בוצעו</span>
+<span class="text-sm font-bold">58 (69%)</span>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<div class="size-3 rounded-full bg-success"></div>
+<div class="flex flex-col">
+<span class="text-xs text-[#4e7397]">עתידיים</span>
+<span class="text-sm font-bold">18 (21%)</span>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<div class="size-3 rounded-full bg-danger"></div>
+<div class="flex flex-col">
+<span class="text-xs text-[#4e7397]">בוטלו</span>
+<span class="text-sm font-bold">8 (10%)</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Left Column: AI Driven Table -->
+<div class="bg-white dark:bg-[#1a242f] rounded-xl border border-[#d0dbe7] dark:border-slate-700 shadow-sm flex flex-col">
+<div class="p-6 border-b border-[#d0dbe7] dark:border-slate-700 flex justify-between items-center">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">psychology</span>
+<h3 class="text-lg font-bold">מטופלים בסיכון נטישה</h3>
+<span class="text-[10px] font-bold bg-primary/10 text-primary px-2 py-0.5 rounded uppercase tracking-wider">Predictive AI</span>
+</div>
+<button class="text-primary text-sm font-medium hover:underline">הצג את כולם</button>
+</div>
+<div class="flex-1 overflow-x-auto">
+<table class="w-full text-right">
+<thead class="bg-slate-50 dark:bg-slate-800/50 text-[#4e7397] text-xs font-bold">
+<tr>
+<th class="px-6 py-4">שם המטופל</th>
+<th class="px-6 py-4">ביקור אחרון</th>
+<th class="px-6 py-4">הסתברות נטישה</th>
+<th class="px-6 py-4">פעולה</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-[#d0dbe7] dark:divide-slate-700">
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="size-8 rounded-full bg-slate-200 overflow-hidden">
+<img class="object-cover size-full" data-alt="Patient profile portrait" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCYqgNIQTy0BzcOxgPQVj3w5D2PptHECMpoLEuSBx0eZFbUF4S2E4d5oSzQ2KL1U4mRSbopXDf6eXypL8SCRyQl62eEE9w9OJtLfjZIEwb1k8NMtvCqLYxhoeSG09Idfm7FU2QBgpuj6NdYgQgmS3aJndzmFqvJXHDuTQxUDMlqLMCOax0oEISOI7hpUhhYhmSsxXMMi5Q-_Xg-MAjPGg4qeu-1yrjFPdjKwO21_5J4_urqkw5fwaOtdfxBBGNxxV6JgmKEInfhXrs4"/>
+</div>
+<span class="text-sm font-medium">ישראל ישראלי</span>
+</div>
+</td>
+<td class="px-6 py-4 text-sm text-slate-500">לפני 4 חודשים</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<div class="flex-1 h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden w-24">
+<div class="h-full bg-danger w-[85%]"></div>
+</div>
+<span class="text-xs font-bold text-danger">גבוהה (85%)</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<button class="text-primary hover:bg-primary/10 p-2 rounded-lg transition-colors">
+<span class="material-symbols-outlined text-lg">outgoing_mail</span>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="size-8 rounded-full bg-slate-200 overflow-hidden">
+<img class="object-cover size-full" data-alt="Patient profile portrait" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAPasXkfmoTy3uqaV4NIos4Gq2N3oAftxy4CJfZLbILXYBL-04tjZkzIuZINnePPL1qhWsXAw4zanHUb6RYp97SjQ2HGwf_aYEO1qoomfq2Qqe838S-iSiCU71EnG_Ebhe9erBscNy4mgf1VnkRJUnzU3olIEa31SU4Y-Xg0PD2M-tugFqSKJJYzJs7MZ02ROmQBs-98a755lLqoj-MYf-aoEtWf0E7OTl6tl1U3kkh2rpvf94d5VyyaUrp7smOIG6tZUuVXYlkUSTK"/>
+</div>
+<span class="text-sm font-medium">מיכל אברהם</span>
+</div>
+</td>
+<td class="px-6 py-4 text-sm text-slate-500">לפני חודשיים</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<div class="flex-1 h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden w-24">
+<div class="h-full bg-warning w-[62%]"></div>
+</div>
+<span class="text-xs font-bold text-warning">בינונית (62%)</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<button class="text-primary hover:bg-primary/10 p-2 rounded-lg transition-colors">
+<span class="material-symbols-outlined text-lg">outgoing_mail</span>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="size-8 rounded-full bg-slate-200 overflow-hidden">
+<img class="object-cover size-full" data-alt="Patient profile portrait" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDBDFnfg1jD8Lz0CYAw3lGxubAxXrXyp_tp3JgGR37NQ6p4nRSh5Q1TkCqVVRR4BWDuQADRrV18cpH03-_KGmli3ugtjqkUKplyTTRMl1fjTwLk9BNkTJlrDVc9G0He5b8kiWXYLsVicfOzK0rToxHQGf1yHHDmB-FrjOA-aYNvwEbLnPymsPpH-5eDPfyaIlIz8s6rYcXNb4JuvtHM8K5Rm4_yu9fdXzFl4HqnFDNCiWYt5s0jtoabCbBT-I5y2Gj-miQzKgd_NtOC"/>
+</div>
+<span class="text-sm font-medium">שרה לוי</span>
+</div>
+</td>
+<td class="px-6 py-4 text-sm text-slate-500">לפני 3 שבועות</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<div class="flex-1 h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden w-24">
+<div class="h-full bg-success w-[15%]"></div>
+</div>
+<span class="text-xs font-bold text-success">נמוכה (15%)</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<button class="text-primary hover:bg-primary/10 p-2 rounded-lg transition-colors">
+<span class="material-symbols-outlined text-lg">outgoing_mail</span>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="size-8 rounded-full bg-slate-200 overflow-hidden">
+<img class="object-cover size-full" data-alt="Patient profile portrait" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAc261cP-uOphp7Rc5V3GgxYw6M0Hvr0Jfe6rn0HGqIaKSS-dctuA6wl4rPSor_N_auxOrwKerVG5ZiLYqA8Z7bUQXRoySjmnSiZf5HELWHCsGEFAWS5e4ia4nU4tAoe8ugd0wXlNKo0867RvyYZd5pVG8x-nxKWsouvFljYBuSBXx8VS5SNML86fXMsN4JQCloklIUNSnFxTlp6sTFhVldX7r-saD7cSsRFBebWUkvESd2obagwq55UfN19WHxLRrfBhUrFMnHx-L8"/>
+</div>
+<span class="text-sm font-medium">יעקב כהן</span>
+</div>
+</td>
+<td class="px-6 py-4 text-sm text-slate-500">לפני 5 חודשים</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<div class="flex-1 h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden w-24">
+<div class="h-full bg-danger w-[92%]"></div>
+</div>
+<span class="text-xs font-bold text-danger">קריטית (92%)</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<button class="text-primary hover:bg-primary/10 p-2 rounded-lg transition-colors">
+<span class="material-symbols-outlined text-lg">outgoing_mail</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Recommendation Footer -->
+<div class="p-4 bg-primary/5 dark:bg-primary/10 mt-auto border-t border-[#d0dbe7] dark:border-slate-700">
+<p class="text-xs text-[#4e7397] dark:text-slate-400">
+<span class="font-bold text-primary">המלצת AI:</span> מומלץ לשלוח הודעת תזכורת לבדיקה תקופתית לישראל ישראלי ויעקב כהן עקב היעדרות ממושכת.
+                        </p>
+</div>
+</div>
+</div>
+<!-- Floating RAG Chat Button -->
+<button class="fixed bottom-8 left-8 size-14 bg-primary text-white rounded-full shadow-2xl flex items-center justify-center hover:scale-105 transition-transform group">
+<span class="material-symbols-outlined text-2xl group-hover:hidden">chat_bubble</span>
+<span class="hidden group-hover:inline text-xs font-bold">שאל את ה-AI</span>
+</button>
+</main>
+</div>
+</body></html>

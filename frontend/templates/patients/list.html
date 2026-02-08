@@ -1,0 +1,193 @@
+{% extends 'base.html' %}
+{% block title %}מטופלים - מערכת ניהול מרפאה{% endblock %}
+
+{% block content %}
+<div class="flex justify-between items-center mb-6">
+    <h1 class="text-2xl font-bold">מטופלים</h1>
+    <button onclick="openCreateModal()"
+            class="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-lg font-bold flex items-center gap-2 shadow-lg shadow-primary/20 transition-all">
+        <span class="material-symbols-outlined text-sm">add</span>
+        מטופל חדש
+    </button>
+</div>
+
+<!-- Search -->
+<div class="bg-white rounded-xl border border-[#d0dbe7] shadow-sm mb-6">
+    <div class="p-4 flex items-center gap-4">
+        <div class="relative flex-1">
+            <input id="searchInput" type="text" value="{{ search }}"
+                   class="w-full pr-10 pl-4 py-2 bg-slate-50 border border-[#d0dbe7] rounded-lg text-sm focus:ring-primary focus:border-primary"
+                   placeholder="חיפוש לפי שם, טלפון או ת.ז..."/>
+            <span class="material-symbols-outlined absolute right-3 top-2.5 text-slate-400 text-lg">search</span>
+        </div>
+    </div>
+</div>
+
+<!-- Table -->
+<div class="bg-white rounded-xl border border-[#d0dbe7] shadow-sm overflow-hidden">
+    <div class="overflow-x-auto">
+        <table class="w-full text-right">
+            <thead class="bg-slate-50 text-[#4e7397] text-xs font-bold">
+                <tr>
+                    <th class="px-6 py-4">שם מלא</th>
+                    <th class="px-6 py-4">ת.ז</th>
+                    <th class="px-6 py-4">טלפון</th>
+                    <th class="px-6 py-4">אימייל</th>
+                    <th class="px-6 py-4">מין</th>
+                    <th class="px-6 py-4">פעולות</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-[#d0dbe7]">
+                {% for patient in data %}
+                <tr class="hover:bg-slate-50 transition-colors cursor-pointer" onclick="window.location.href='{{ url_for('patients.detail', patient_id=patient.id) }}'">
+                    <td class="px-6 py-4">
+                        <div class="flex items-center gap-3">
+                            <div class="size-8 rounded-full bg-primary/10 flex items-center justify-center text-primary text-xs font-bold">
+                                {{ patient.first_name[0] }}
+                            </div>
+                            <span class="text-sm font-medium">{{ patient.first_name }} {{ patient.last_name }}</span>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 text-sm">{{ patient.id_number or '-' }}</td>
+                    <td class="px-6 py-4 text-sm">{{ patient.phone or '-' }}</td>
+                    <td class="px-6 py-4 text-sm">{{ patient.email or '-' }}</td>
+                    <td class="px-6 py-4 text-sm">
+                        {% if patient.gender == 'male' %}זכר{% elif patient.gender == 'female' %}נקבה{% else %}אחר{% endif %}
+                    </td>
+                    <td class="px-6 py-4" onclick="event.stopPropagation()">
+                        <div class="flex items-center gap-1">
+                            <button onclick="openEditModal('{{ patient.id }}', {{ patient | tojson }})"
+                                    class="text-primary hover:bg-primary/10 p-2 rounded-lg transition-colors">
+                                <span class="material-symbols-outlined text-lg">edit</span>
+                            </button>
+                            <button onclick="deleteRecord('/api/patients/{{ patient.id }}', '{{ patient.first_name }} {{ patient.last_name }}')"
+                                    class="text-danger hover:bg-danger/10 p-2 rounded-lg transition-colors">
+                                <span class="material-symbols-outlined text-lg">delete</span>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="6" class="px-6 py-12 text-center text-[#4e7397]">לא נמצאו מטופלים</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    {% if total > limit %}
+    <div class="p-4 border-t border-[#d0dbe7] flex justify-between items-center">
+        <span class="text-sm text-[#4e7397]">מציג {{ ((page-1)*limit)+1 }}-{{ [page*limit, total]|min }} מתוך {{ total }}</span>
+        <div class="flex gap-1">
+            {% for p in range(1, (total // limit) + 2) %}
+                {% if p <= (total // limit) + 1 %}
+                <button onclick="goToPage({{ p }})"
+                        class="px-3 py-1 rounded-lg text-sm {% if p == page %}bg-primary text-white{% else %}hover:bg-slate-100 text-[#4e7397]{% endif %}">
+                    {{ p }}
+                </button>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Create/Edit Modal -->
+<div id="patientModal" class="hidden fixed inset-0 bg-black/40 z-50 flex items-center justify-center">
+    <div class="bg-white rounded-xl shadow-xl w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto">
+        <div class="p-6 border-b border-[#d0dbe7] flex justify-between items-center">
+            <h3 id="modalTitle" class="text-lg font-bold">מטופל חדש</h3>
+            <button onclick="closeModal('patientModal')" class="text-slate-400 hover:text-slate-600">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+        <form id="patientForm" class="p-6 space-y-4">
+            <input type="hidden" id="editPatientId" value="">
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-[#4e7397] mb-1">שם פרטי</label>
+                    <input name="first_name" required class="w-full px-3 py-2 bg-slate-50 border border-[#d0dbe7] rounded-lg text-sm focus:ring-primary focus:border-primary"/>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-[#4e7397] mb-1">שם משפחה</label>
+                    <input name="last_name" required class="w-full px-3 py-2 bg-slate-50 border border-[#d0dbe7] rounded-lg text-sm focus:ring-primary focus:border-primary"/>
+                </div>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-[#4e7397] mb-1">ת.ז</label>
+                    <input name="id_number" class="w-full px-3 py-2 bg-slate-50 border border-[#d0dbe7] rounded-lg text-sm focus:ring-primary focus:border-primary"/>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-[#4e7397] mb-1">תאריך לידה</label>
+                    <input name="date_of_birth" type="date" class="w-full px-3 py-2 bg-slate-50 border border-[#d0dbe7] rounded-lg text-sm focus:ring-primary focus:border-primary"/>
+                </div>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-[#4e7397] mb-1">טלפון</label>
+                    <input name="phone" class="w-full px-3 py-2 bg-slate-50 border border-[#d0dbe7] rounded-lg text-sm focus:ring-primary focus:border-primary"/>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-[#4e7397] mb-1">מין</label>
+                    <select name="gender" class="w-full px-3 py-2 bg-slate-50 border border-[#d0dbe7] rounded-lg text-sm focus:ring-primary focus:border-primary">
+                        <option value="male">זכר</option>
+                        <option value="female">נקבה</option>
+                        <option value="other">אחר</option>
+                    </select>
+                </div>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-[#4e7397] mb-1">אימייל</label>
+                <input name="email" type="email" class="w-full px-3 py-2 bg-slate-50 border border-[#d0dbe7] rounded-lg text-sm focus:ring-primary focus:border-primary"/>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-[#4e7397] mb-1">כתובת</label>
+                <input name="address" class="w-full px-3 py-2 bg-slate-50 border border-[#d0dbe7] rounded-lg text-sm focus:ring-primary focus:border-primary"/>
+            </div>
+        </form>
+        <div class="p-6 border-t border-[#d0dbe7] flex justify-end gap-3">
+            <button onclick="closeModal('patientModal')"
+                    class="px-4 py-2 rounded-lg border border-[#d0dbe7] text-[#4e7397] hover:bg-slate-50 transition-colors">
+                ביטול
+            </button>
+            <button onclick="savePatient()"
+                    class="px-4 py-2 rounded-lg bg-primary text-white font-bold hover:bg-primary/90 transition-all">
+                שמירה
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/crud-tables.js') }}"></script>
+<script>
+    initSearch('searchInput');
+
+    function openCreateModal() {
+        document.getElementById('editPatientId').value = '';
+        document.getElementById('modalTitle').textContent = 'מטופל חדש';
+        document.getElementById('patientForm').reset();
+        openModal('patientModal');
+    }
+
+    function openEditModal(id, patient) {
+        document.getElementById('editPatientId').value = id;
+        document.getElementById('modalTitle').textContent = 'עריכת מטופל';
+        populateForm('patientForm', patient);
+        openModal('patientModal');
+    }
+
+    function savePatient() {
+        const id = document.getElementById('editPatientId').value;
+        if (id) {
+            submitForm(`/api/patients/${id}`, 'PUT', 'patientForm', 'patientModal');
+        } else {
+            submitForm('/api/patients', 'POST', 'patientForm', 'patientModal');
+        }
+    }
+</script>
+{% endblock %}

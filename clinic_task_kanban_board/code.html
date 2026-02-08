@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+
+<html class="light" dir="rtl" lang="he"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ניהול משימות מרפאה - CRM</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#197fe6",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#111921",
+                        "card-light": "#ffffff",
+                        "card-dark": "#1e293b",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            font-family: 'Manrope', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-[#0e141b] dark:text-slate-100 transition-colors duration-200">
+<div class="flex h-screen overflow-hidden">
+<!-- Sidebar Navigation -->
+<aside class="w-64 border-l border-[#d0dbe7] dark:border-slate-700 bg-white dark:bg-slate-900 flex flex-col h-full">
+<div class="p-6 flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">medical_services</span>
+</div>
+<div>
+<h1 class="text-base font-bold leading-tight">מרפאה פרטית</h1>
+<p class="text-xs text-[#4e7397] dark:text-slate-400">ד"ר כהן</p>
+</div>
+</div>
+<nav class="flex-1 px-4 space-y-1 overflow-y-auto">
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-[#4e7397] dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-sm font-medium">לוח בקרה</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-[#4e7397] dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined">groups</span>
+<span class="text-sm font-medium">תיקי מטופלים</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg bg-primary/10 text-primary" href="#">
+<span class="material-symbols-outlined">assignment</span>
+<span class="text-sm font-medium font-bold">ניהול משימות</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-[#4e7397] dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined">calendar_month</span>
+<span class="text-sm font-medium">יומן תורים</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-[#4e7397] dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined">monitoring</span>
+<span class="text-sm font-medium">דוחות ומדדים</span>
+</a>
+</nav>
+<div class="p-4 border-t border-[#d0dbe7] dark:border-slate-700 space-y-2">
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-[#4e7397] dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-sm font-medium">הגדרות</span>
+</a>
+<button class="w-full bg-primary text-white py-2 rounded-lg font-bold text-sm flex items-center justify-center gap-2 hover:bg-primary/90">
+<span class="material-symbols-outlined text-sm">add</span>
+                    משימה חדשה
+                </button>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col overflow-hidden">
+<!-- Header -->
+<header class="h-16 border-b border-[#d0dbe7] dark:border-slate-700 bg-white dark:bg-slate-900 px-8 flex items-center justify-between z-10">
+<div class="flex items-center gap-6">
+<h2 class="text-lg font-bold">לוח משימות מרפאה</h2>
+<div class="relative w-72">
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-[#4e7397] text-sm">search</span>
+<input class="w-full bg-[#f0f2f5] dark:bg-slate-800 border-none rounded-lg pr-10 text-sm focus:ring-1 focus:ring-primary" placeholder="חיפוש משימה..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<button class="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-[#4e7397] dark:text-slate-300">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<div class="flex items-center gap-3 border-r border-[#d0dbe7] dark:border-slate-700 pr-3 mr-3">
+<div class="text-left">
+<p class="text-sm font-bold leading-none">ד"ר ירון כהן</p>
+<p class="text-xs text-[#4e7397] dark:text-slate-400">רופא ראשי</p>
+</div>
+<img alt="Profile" class="w-8 h-8 rounded-full object-cover" data-alt="Doctor profile picture portrait" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAafBJILd_4VDO-6KtyTyhWpgVSTI_Ks19jvVQo5rvjazaDA_KqH2ekFIGb3Vqk00G1yjnHlfCvNCw_bsYbjpU4buZlSinueFqjTcmTMssi4UgMSW2P1-4zeHSIZa6Z_8dw9cgueES394e6Q0URM8ClMQxO76zUF9rAiNQsu0xQdSwafBjlIF8LH63Jphfuul4xbivTnN9lvp6ZzY1Zr9TBvwwJqWTNhFp1JtqcjugcUON_yss9uYqu6ouzz1CJbpfc_i2wuJLJn5-A"/>
+</div>
+</div>
+</header>
+<!-- Board View -->
+<div class="flex-1 overflow-x-auto p-8 bg-[#f8fafc] dark:bg-background-dark">
+<div class="flex gap-6 h-full min-w-max">
+<!-- Column: Open (פתוח) -->
+<div class="flex flex-col w-80 shrink-0">
+<div class="flex items-center justify-between mb-4 px-1">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-primary"></span>
+<h3 class="font-bold text-sm">פתוח</h3>
+<span class="bg-slate-200 dark:bg-slate-800 text-xs px-2 py-0.5 rounded-full font-bold">3</span>
+</div>
+<button class="text-[#4e7397] hover:text-primary"><span class="material-symbols-outlined text-xl">more_horiz</span></button>
+</div>
+<div class="flex-1 space-y-4 overflow-y-auto pb-4 scrollbar-hide">
+<!-- Task Card 1 -->
+<div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-transparent hover:border-primary/30 cursor-grab active:cursor-grabbing transition-all">
+<div class="flex justify-between items-start mb-2">
+<span class="text-[10px] px-2 py-0.5 rounded font-bold uppercase tracking-wider bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400">דחוף</span>
+<span class="material-symbols-outlined text-sm text-slate-400">drag_indicator</span>
+</div>
+<h4 class="text-sm font-bold mb-3 leading-snug">תיאום תור דחוף - ניתוח קטרקט (משפחת לוי)</h4>
+<div class="flex items-center justify-between mt-4">
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center text-[10px] font-bold text-blue-600">מ</div>
+<span class="text-xs text-[#4e7397] dark:text-slate-400">מזכירות</span>
+</div>
+<div class="flex items-center gap-1 text-[#4e7397] dark:text-slate-400">
+<span class="material-symbols-outlined text-xs">calendar_today</span>
+<span class="text-[10px]">היום</span>
+</div>
+</div>
+</div>
+<!-- Task Card 2 -->
+<div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-transparent hover:border-primary/30 cursor-grab transition-all">
+<div class="flex justify-between items-start mb-2">
+<span class="text-[10px] px-2 py-0.5 rounded font-bold uppercase tracking-wider bg-yellow-100 text-yellow-600 dark:bg-yellow-900/30 dark:text-yellow-400">בינוני</span>
+<span class="material-symbols-outlined text-sm text-slate-400">drag_indicator</span>
+</div>
+<h4 class="text-sm font-bold mb-3 leading-snug">הזמנת מלאי מחטים ומזרקים לרבעון ג'</h4>
+<div class="flex items-center justify-between mt-4">
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-[10px] font-bold">י</div>
+<span class="text-xs text-[#4e7397] dark:text-slate-400">ד"ר ירון</span>
+</div>
+<div class="flex items-center gap-1 text-[#4e7397] dark:text-slate-400">
+<span class="material-symbols-outlined text-xs">calendar_today</span>
+<span class="text-[10px]">15/10</span>
+</div>
+</div>
+</div>
+<!-- Task Card 3 -->
+<div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-transparent hover:border-primary/30 cursor-grab transition-all">
+<div class="flex justify-between items-start mb-2">
+<span class="text-[10px] px-2 py-0.5 rounded font-bold uppercase tracking-wider bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400">רגיל</span>
+<span class="material-symbols-outlined text-sm text-slate-400">drag_indicator</span>
+</div>
+<h4 class="text-sm font-bold mb-3 leading-snug">עדכון פרוטוקול חיטוי חדר ניתוח</h4>
+<div class="flex items-center justify-between mt-4">
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center text-[10px] font-bold text-blue-600">מ</div>
+<span class="text-xs text-[#4e7397] dark:text-slate-400">מזכירות</span>
+</div>
+<div class="flex items-center gap-1 text-[#4e7397] dark:text-slate-400">
+<span class="material-symbols-outlined text-xs">calendar_today</span>
+<span class="text-[10px]">20/10</span>
+</div>
+</div>
+</div>
+<button class="w-full border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-xl py-4 text-[#4e7397] hover:bg-white dark:hover:bg-slate-800 hover:border-primary transition-all flex flex-col items-center gap-1 group">
+<span class="material-symbols-outlined group-hover:text-primary">add</span>
+<span class="text-xs font-bold">הוספת משימה</span>
+</button>
+</div>
+</div>
+<!-- Column: In Progress (בביצוע) -->
+<div class="flex flex-col w-80 shrink-0">
+<div class="flex items-center justify-between mb-4 px-1">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-orange-400"></span>
+<h3 class="font-bold text-sm">בביצוע</h3>
+<span class="bg-slate-200 dark:bg-slate-800 text-xs px-2 py-0.5 rounded-full font-bold">2</span>
+</div>
+<button class="text-[#4e7397] hover:text-primary"><span class="material-symbols-outlined text-xl">more_horiz</span></button>
+</div>
+<div class="flex-1 space-y-4 overflow-y-auto pb-4 scrollbar-hide">
+<!-- Task Card 4 -->
+<div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border-r-4 border-r-orange-400 border border-transparent hover:border-primary/30 cursor-grab transition-all">
+<div class="flex justify-between items-start mb-2">
+<span class="text-[10px] px-2 py-0.5 rounded font-bold uppercase tracking-wider bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400">דחוף</span>
+<span class="material-symbols-outlined text-sm text-slate-400">drag_indicator</span>
+</div>
+<h4 class="text-sm font-bold mb-3 leading-snug">מעקב תוצאות בדיקות דם דחופות - כהן משה</h4>
+<div class="flex items-center justify-between mt-4">
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-[10px] font-bold">י</div>
+<span class="text-xs text-[#4e7397] dark:text-slate-400">ד"ר ירון</span>
+</div>
+<div class="flex items-center gap-1 text-red-500">
+<span class="material-symbols-outlined text-xs">timer</span>
+<span class="text-[10px] font-bold">עוד שעה</span>
+</div>
+</div>
+</div>
+<!-- Task Card 5 -->
+<div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border-r-4 border-r-orange-400 border border-transparent hover:border-primary/30 cursor-grab transition-all">
+<div class="flex justify-between items-start mb-2">
+<span class="text-[10px] px-2 py-0.5 rounded font-bold uppercase tracking-wider bg-yellow-100 text-yellow-600 dark:bg-yellow-900/30 dark:text-yellow-400">בינוני</span>
+<span class="material-symbols-outlined text-sm text-slate-400">drag_indicator</span>
+</div>
+<h4 class="text-sm font-bold mb-3 leading-snug">עדכון תיק רפואי - גב' שרה אברהם</h4>
+<div class="flex items-center justify-between mt-4">
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center text-[10px] font-bold text-blue-600">מ</div>
+<span class="text-xs text-[#4e7397] dark:text-slate-400">מזכירות</span>
+</div>
+<div class="flex items-center gap-1 text-[#4e7397] dark:text-slate-400">
+<span class="material-symbols-outlined text-xs">calendar_today</span>
+<span class="text-[10px]">12/10</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Column: Done (בוצע) -->
+<div class="flex flex-col w-80 shrink-0 opacity-75 grayscale-[0.2]">
+<div class="flex items-center justify-between mb-4 px-1">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-green-500"></span>
+<h3 class="font-bold text-sm">בוצע</h3>
+<span class="bg-slate-200 dark:bg-slate-800 text-xs px-2 py-0.5 rounded-full font-bold">5</span>
+</div>
+<button class="text-[#4e7397] hover:text-primary"><span class="material-symbols-outlined text-xl">more_horiz</span></button>
+</div>
+<div class="flex-1 space-y-4 overflow-y-auto pb-4 scrollbar-hide">
+<!-- Task Card 6 -->
+<div class="bg-white/60 dark:bg-slate-800/60 p-4 rounded-xl shadow-sm border border-transparent line-through decoration-slate-400">
+<div class="flex justify-between items-start mb-2">
+<span class="text-[10px] px-2 py-0.5 rounded font-bold uppercase tracking-wider bg-slate-100 text-slate-400 dark:bg-slate-700">הסתיים</span>
+<span class="material-symbols-outlined text-sm text-green-500">check_circle</span>
+</div>
+<h4 class="text-sm font-bold mb-3 leading-snug text-slate-500">סיכום פגישת צוות שבועית</h4>
+<div class="flex items-center justify-between mt-4">
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-[10px] font-bold">י</div>
+<span class="text-xs text-slate-400">ד"ר ירון</span>
+</div>
+<span class="text-[10px] text-slate-400">אתמול</span>
+</div>
+</div>
+<!-- Task Card 7 -->
+<div class="bg-white/60 dark:bg-slate-800/60 p-4 rounded-xl shadow-sm border border-transparent line-through decoration-slate-400">
+<div class="flex justify-between items-start mb-2">
+<span class="text-[10px] px-2 py-0.5 rounded font-bold uppercase tracking-wider bg-slate-100 text-slate-400 dark:bg-slate-700">הסתיים</span>
+<span class="material-symbols-outlined text-sm text-green-500">check_circle</span>
+</div>
+<h4 class="text-sm font-bold mb-3 leading-snug text-slate-500">בדיקת מלאי תרופות חירום</h4>
+<div class="flex items-center justify-between mt-4">
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded-full bg-blue-100/50 dark:bg-blue-900/50 flex items-center justify-center text-[10px] font-bold text-blue-600/50">מ</div>
+<span class="text-xs text-slate-400">מזכירות</span>
+</div>
+<span class="text-[10px] text-slate-400">08/10</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Column Placeholder -->
+<div class="flex flex-col w-80 shrink-0 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-2xl items-center justify-center bg-slate-50/50 dark:bg-slate-900/20 group cursor-pointer">
+<span class="material-symbols-outlined text-slate-300 dark:text-slate-700 group-hover:text-primary transition-colors">add_circle</span>
+<span class="text-xs font-bold text-slate-400 mt-2">הוספת עמודה חדשה</span>
+</div>
+</div>
+</div>
+<!-- Bottom Tab Bar (Quick Access) -->
+<div class="h-12 border-t border-[#d0dbe7] dark:border-slate-700 bg-white dark:bg-slate-900 flex items-center px-8 gap-8">
+<div class="flex items-center gap-2 text-primary font-bold text-xs border-b-2 border-primary h-full">
+<span class="material-symbols-outlined text-sm">view_kanban</span>
+                    תצוגת לוח
+                </div>
+<div class="flex items-center gap-2 text-[#4e7397] dark:text-slate-400 font-medium text-xs h-full cursor-pointer hover:text-primary">
+<span class="material-symbols-outlined text-sm">list</span>
+                    תצוגת רשימה
+                </div>
+<div class="flex items-center gap-2 text-[#4e7397] dark:text-slate-400 font-medium text-xs h-full cursor-pointer hover:text-primary">
+<span class="material-symbols-outlined text-sm">calendar_view_month</span>
+                    תצוגת יומן
+                </div>
+<div class="mr-auto flex items-center gap-4">
+<div class="flex -space-x-2 space-x-reverse">
+<img alt="U1" class="w-6 h-6 rounded-full border-2 border-white dark:border-slate-900" data-alt="Staff member portrait 1" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAYawprR4VT1hR6XhrsSemRjiVIlj0YzowPx3JXluZ8dMrZGaR7oG5eq9h3b5UY-Gr6lDEbIwu8FyaUScxWpjGN4lsREPHZFvjvZApMgeK3KO3G_CYH0brZ7VyMYjNIGLrqHXPHrY4Y1vWlMiCpy6E4JAUGJ65iD031JTyW6tKlXgo5kA-uHVZUr8IScjwmWUSs_XIYFGvUgZWXQyPsu25JvU1K3jTQeJ2BTYP3qpzv7IJwUKOg_u3in1zGhsCFOQc_VIqDQh7ECNVG"/>
+<img alt="U2" class="w-6 h-6 rounded-full border-2 border-white dark:border-slate-900" data-alt="Staff member portrait 2" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAiO4FDW9RTGzK_sjHu3_zCM85S-rQ6CnA1dp7g6C63B49MdsF97Nh88t8l5A27RfU4R9O2xzxrmeoJh6TF7oERWBVwyz9ZP7Wm6kVStr3J9kaq7X7fFeCbbbb6lyrsFNepEJWZWDLuKawgkGvwaQKUhiB8xz0otNNke9Aw6i12duyEenD7hZYgYe-d7lqNpApyQkIpNLgTUU9NBCPsO615BjEYP51gUukYTDvT-FFEkcEDOvWwxcGy9uGQG_Mft_w0c5SrxKLS0WJk"/>
+<div class="w-6 h-6 rounded-full border-2 border-white dark:border-slate-900 bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-[8px] font-bold text-slate-500">+3</div>
+</div>
+<span class="text-[10px] text-[#4e7397] dark:text-slate-400">צוות המרפאה מחובר</span>
+</div>
+</div>
+</main>
+</div>
+</body></html>

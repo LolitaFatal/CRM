@@ -1,0 +1,164 @@
+{% extends 'base.html' %}
+{% block title %}שירותים - מערכת ניהול מרפאה{% endblock %}
+
+{% block content %}
+<div class="flex justify-between items-center mb-6">
+    <h1 class="text-2xl font-bold">שירותים</h1>
+    <button onclick="openCreateModal()"
+            class="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-lg font-bold flex items-center gap-2 shadow-lg shadow-primary/20 transition-all">
+        <span class="material-symbols-outlined text-sm">add</span>
+        שירות חדש
+    </button>
+</div>
+
+<!-- Search -->
+<div class="bg-white rounded-xl border border-[#d0dbe7] shadow-sm mb-6">
+    <div class="p-4">
+        <div class="relative">
+            <input id="searchInput" type="text" value="{{ search }}"
+                   class="w-full pr-10 pl-4 py-2 bg-slate-50 border border-[#d0dbe7] rounded-lg text-sm focus:ring-primary focus:border-primary"
+                   placeholder="חיפוש שירות..."/>
+            <span class="material-symbols-outlined absolute right-3 top-2.5 text-slate-400 text-lg">search</span>
+        </div>
+    </div>
+</div>
+
+<!-- Table -->
+<div class="bg-white rounded-xl border border-[#d0dbe7] shadow-sm overflow-hidden">
+    <div class="overflow-x-auto">
+        <table class="w-full text-right">
+            <thead class="bg-slate-50 text-[#4e7397] text-xs font-bold">
+                <tr>
+                    <th class="px-6 py-4">שם השירות</th>
+                    <th class="px-6 py-4">תיאור</th>
+                    <th class="px-6 py-4">מחיר</th>
+                    <th class="px-6 py-4">משך (דקות)</th>
+                    <th class="px-6 py-4">סטטוס</th>
+                    <th class="px-6 py-4">פעולות</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-[#d0dbe7]">
+                {% for service in data %}
+                <tr class="hover:bg-slate-50 transition-colors">
+                    <td class="px-6 py-4">
+                        <div class="flex items-center gap-3">
+                            <div class="size-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+                                <span class="material-symbols-outlined text-sm">medical_services</span>
+                            </div>
+                            <span class="text-sm font-medium">{{ service.name }}</span>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 text-sm text-slate-500">{{ service.description or '-' }}</td>
+                    <td class="px-6 py-4 text-sm font-bold">₪{{ '{:,.0f}'.format(service.price|float) }}</td>
+                    <td class="px-6 py-4 text-sm">{{ service.duration_minutes }} דק'</td>
+                    <td class="px-6 py-4">
+                        {% if service.is_active %}
+                        <span class="px-2 py-1 rounded-full bg-green-100 text-green-700 text-xs font-bold">פעיל</span>
+                        {% else %}
+                        <span class="px-2 py-1 rounded-full bg-slate-100 text-slate-500 text-xs font-bold">לא פעיל</span>
+                        {% endif %}
+                    </td>
+                    <td class="px-6 py-4">
+                        <div class="flex items-center gap-1">
+                            <button onclick='openEditModal("{{ service.id }}", {{ service | tojson }})'
+                                    class="text-primary hover:bg-primary/10 p-2 rounded-lg transition-colors">
+                                <span class="material-symbols-outlined text-lg">edit</span>
+                            </button>
+                            <button onclick="deleteRecord('/api/services/{{ service.id }}', '{{ service.name }}')"
+                                    class="text-danger hover:bg-danger/10 p-2 rounded-lg transition-colors">
+                                <span class="material-symbols-outlined text-lg">delete</span>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="6" class="px-6 py-12 text-center text-[#4e7397]">לא נמצאו שירותים</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% if total > limit %}
+    <div class="p-4 border-t border-[#d0dbe7] flex justify-between items-center">
+        <span class="text-sm text-[#4e7397]">מציג {{ ((page-1)*limit)+1 }}-{{ [page*limit, total]|min }} מתוך {{ total }}</span>
+        <div class="flex gap-1">
+            {% for p in range(1, (total // limit) + 2) %}
+            <button onclick="goToPage({{ p }})" class="px-3 py-1 rounded-lg text-sm {% if p == page %}bg-primary text-white{% else %}hover:bg-slate-100 text-[#4e7397]{% endif %}">{{ p }}</button>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Modal -->
+<div id="serviceModal" class="hidden fixed inset-0 bg-black/40 z-50 flex items-center justify-center">
+    <div class="bg-white rounded-xl shadow-xl w-full max-w-lg mx-4">
+        <div class="p-6 border-b border-[#d0dbe7] flex justify-between items-center">
+            <h3 id="modalTitle" class="text-lg font-bold">שירות חדש</h3>
+            <button onclick="closeModal('serviceModal')" class="text-slate-400 hover:text-slate-600">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+        <form id="serviceForm" class="p-6 space-y-4">
+            <input type="hidden" id="editServiceId" value="">
+            <div>
+                <label class="block text-sm font-medium text-[#4e7397] mb-1">שם השירות</label>
+                <input name="name" required class="w-full px-3 py-2 bg-slate-50 border border-[#d0dbe7] rounded-lg text-sm focus:ring-primary focus:border-primary"/>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-[#4e7397] mb-1">תיאור</label>
+                <input name="description" class="w-full px-3 py-2 bg-slate-50 border border-[#d0dbe7] rounded-lg text-sm focus:ring-primary focus:border-primary"/>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-[#4e7397] mb-1">מחיר (₪)</label>
+                    <input name="price" type="number" required class="w-full px-3 py-2 bg-slate-50 border border-[#d0dbe7] rounded-lg text-sm focus:ring-primary focus:border-primary"/>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-[#4e7397] mb-1">משך (דקות)</label>
+                    <input name="duration_minutes" type="number" value="30" class="w-full px-3 py-2 bg-slate-50 border border-[#d0dbe7] rounded-lg text-sm focus:ring-primary focus:border-primary"/>
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <input name="is_active" type="checkbox" checked class="rounded border-[#d0dbe7] text-primary focus:ring-primary"/>
+                <label class="text-sm text-[#4e7397]">שירות פעיל</label>
+            </div>
+        </form>
+        <div class="p-6 border-t border-[#d0dbe7] flex justify-end gap-3">
+            <button onclick="closeModal('serviceModal')" class="px-4 py-2 rounded-lg border border-[#d0dbe7] text-[#4e7397] hover:bg-slate-50">ביטול</button>
+            <button onclick="saveService()" class="px-4 py-2 rounded-lg bg-primary text-white font-bold hover:bg-primary/90">שמירה</button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/crud-tables.js') }}"></script>
+<script>
+    initSearch('searchInput');
+    function openCreateModal() {
+        document.getElementById('editServiceId').value = '';
+        document.getElementById('modalTitle').textContent = 'שירות חדש';
+        document.getElementById('serviceForm').reset();
+        openModal('serviceModal');
+    }
+    function openEditModal(id, service) {
+        document.getElementById('editServiceId').value = id;
+        document.getElementById('modalTitle').textContent = 'עריכת שירות';
+        populateForm('serviceForm', service);
+        openModal('serviceModal');
+    }
+    function saveService() {
+        const id = document.getElementById('editServiceId').value;
+        const data = collectFormData('serviceForm');
+        data.is_active = document.querySelector('[name=is_active]').checked;
+        data.price = parseFloat(data.price);
+        data.duration_minutes = parseInt(data.duration_minutes);
+
+        const url = id ? `/api/services/${id}` : '/api/services';
+        const method = id ? 'PUT' : 'POST';
+        apiFetch(url, { method, body: data }).then(r => {
+            if (r.success) { showToast('נשמר בהצלחה', 'success'); setTimeout(() => location.reload(), 500); }
+        });
+    }
+</script>
+{% endblock %}

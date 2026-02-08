@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls:*)",
+      "Bash(du:*)",
+      "Read(//c/Users/User/Desktop/stitch \\(1\\)/**)"
+    ]
+  }
+}
