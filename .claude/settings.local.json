@@ -3,7 +3,9 @@
     "allow": [
       "Bash(ls:*)",
       "Bash(du:*)",
-      "Read(//c/Users/User/Desktop/stitch \\(1\\)/**)"
+      "Read(//c/Users/User/Desktop/stitch \\(1\\)/**)",
+      "Bash(gh auth status:*)",
+      "Bash(git add:*)"
     ]
   }
 }
