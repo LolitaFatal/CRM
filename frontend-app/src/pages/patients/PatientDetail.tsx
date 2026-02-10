@@ -56,7 +56,7 @@ export default function PatientDetail() {
             <div><span className="text-gray-500">מגדר:</span> <span className="text-gray-800 mr-2">{patient.gender === 'male' ? 'זכר' : 'נקבה'}</span></div>
             <div><span className="text-gray-500">תאריך לידה:</span> <span className="text-gray-800 mr-2">{patient.date_of_birth ? formatDate(patient.date_of_birth) : '-'}</span></div>
             <div><span className="text-gray-500">כתובת:</span> <span className="text-gray-800 mr-2">{patient.address || '-'}</span></div>
-            <div><span className="text-gray-500">הערות:</span> <span className="text-gray-800 mr-2">{patient.notes || '-'}</span></div>
+            <div><span className="text-gray-500">ת.ז:</span> <span className="text-gray-800 mr-2">{patient.id_number || '-'}</span></div>
           </div>
         </div>
 
