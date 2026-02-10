@@ -1,4 +1,3 @@
-import os
 from flask import Flask, jsonify
 from flask_cors import CORS
 
@@ -8,9 +7,9 @@ def create_app():
 
     app.config.from_object('backend.config.Config')
 
-    CORS(app, origins=[
-        os.environ.get('FRONTEND_URL', 'http://localhost:5173'),
-    ], supports_credentials=True)
+    frontend_url = app.config.get('FRONTEND_URL', 'http://localhost:5173')
+    allowed_origins = [origin.strip() for origin in frontend_url.split(',') if origin.strip()]
+    CORS(app, origins=allowed_origins, supports_credentials=True)
 
     from backend.routes import register_blueprints
     register_blueprints(app)

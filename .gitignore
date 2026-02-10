@@ -9,6 +9,7 @@ dist/
 build/
 .idea/
 .vscode/
+.claude/settings.local.json
 *.joblib
 node_modules/
 frontend-app/dist/
