@@ -15,7 +15,7 @@ test.py
 pytest.ini
 .pytest_cache
 frontend/
-frontend-app/
+# frontend-app is needed for the frontend service Dockerfile
 clinic_task_kanban_board/
 doctor_crm_dashboard_(rtl)/
 patient_profile_&_medical_history/
